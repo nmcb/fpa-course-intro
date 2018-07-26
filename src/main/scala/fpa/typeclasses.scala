@@ -29,7 +29,6 @@ object library {
   implicit class MaskSyntax[A : Mask](a: A) {
     def disclose: String =
       ???
-
   }
 }
 
