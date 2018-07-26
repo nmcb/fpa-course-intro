@@ -8,18 +8,33 @@ object library {
     def disclose(a: A): String
   }
 
-  /** Type class companion object containing default Mask instances */
-  object Mask {
+  /** Q 1: implement a client side explicit implicit parameter syntax */
+  def methodUsingMaskExplicitly[A](a: A)(implicit mask: Mask[A]): String =
+    mask.disclose(a)
 
-    /** The default is not to mask at all */
-    implicit def noMask[A]: Mask[A] = new Mask[A] {
-      def disclose(a: A): String = a.toString
-    }
+  /** Q 2: Implement a client side implicit implicit parameter syntax */
+  def methodUsingMaskImplicitly[A : Mask](a: A): String =
+    implicitly[Mask[A]].disclose(a)
+
+
+  /** Type class companion objects contain default Mask instances */
+  object Mask {
+    /** Q 3: The default should not to mask at all */
+    implicit def noMask[A]: Mask[A] =
+      (a: A) => {
+        println("noMask")
+        a.toString
+      }
+
   }
 
+  /** Q 4: We should have a nice syntax */
   implicit class MaskSyntax[A : Mask](a: A) {
-    val disclose: String =
+    def disclose: String = {
+      println("MaskSyntax.disclose")
       implicitly[Mask[A]].disclose(a)
+    }
+
   }
 }
 
@@ -28,28 +43,25 @@ object client extends App {
 
   import library._
 
-  // Client side explicit implicit parameter syntax
-  def methodUsingMaskExplicitly[A](a: A)(implicit mask: Mask[A]): String =
-    mask.disclose(a)
-
-  // Client side implicit implicit parameter syntax
-  def methodUsingMaskImplicitly[A : Mask](a: A): String =
-    implicitly[Mask[A]].disclose(a)
-
   // Client side domain
   case class BankNumber(str: String)
   object BankNumber {
-    implicit val maskBankNumber: Mask[BankNumber] = new Mask[BankNumber] {
-      override def disclose(a: BankNumber): String =
+    /** Q 5: BankNumbers should be masked as `BankNumber(masked)` */
+    implicit def maskBankNumber: Mask[BankNumber] = {
+      _ => {
+        println("maskBankNumber")
         "BankNumber(masked)"
+      }
     }
   }
   case class Customer(name: String, bankNumber: BankNumber)
   object Customer {
-    implicit def maskCustomer(implicit bankNumberMask: Mask[BankNumber]): Mask[Customer] = new Mask[Customer] {
-      override def disclose(customer: Customer): String =
-        s"Customer(${customer.name},${bankNumberMask.disclose(customer.bankNumber)})"
-    }
+    /** Q 6: Customers should mask the contained BankNumber */
+    implicit def maskCustomer(implicit bankNumberMask: Mask[BankNumber]): Mask[Customer] =
+      (customer: Customer) => {
+        println("maskCustomer")
+        s"Customer(${customer.name.disclose},${customer.bankNumber.disclose})"
+      }
   }
 
 }
