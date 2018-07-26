@@ -35,7 +35,7 @@ class MaskSpec extends FlatSpec with Matchers {
 
   it should "have a nice syntax" in {
     import client._
-    val customer = Customer("Name", BankNumber("1234567890"))
-    "customer.disclose" should compile
+    """Customer("Name", BankNumber("1234567890")).disclose""" should compile
+    Customer("Name", BankNumber("1234567890")).disclose should be ("Customer(Name,BankNumber(masked))")
   }
 }
