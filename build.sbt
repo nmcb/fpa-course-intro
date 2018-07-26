@@ -1,6 +1,6 @@
 import Dependencies._
 
-lazy val root = (project in file(".")).
+lazy val `fpa-course-intro` = (project in file(".")).
   settings(
     inThisBuild(List(
       organization := "fpa",
