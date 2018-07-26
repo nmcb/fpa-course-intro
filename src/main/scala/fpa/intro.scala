@@ -1,7 +1,7 @@
 package fpa
 package intro
 
-// A version of the archetypical introductionary Hello World code
+// A version of the archetypical, introductionary "Hello World" example in Scala
 
 object Hello extends Greeting with App {
   println(greeting)
