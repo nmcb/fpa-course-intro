@@ -8,28 +8,33 @@ object library {
     def disclose(a: A): String
   }
 
+  /** Q 1: implement a client side explicit implicit parameter syntax */
+  def methodUsingMaskExplicitly[A](a: A)(implicit mask: Mask[A]): String =
+    ???
+
+  /** Q 2: Implement a client side implicit implicit parameter syntax */
+  def methodUsingMaskImplicitly[A : Mask](a: A): String =
+    ???
+
+
   /** Type class companion objects contain default Mask instances */
   object Mask {
-    /** Q: The default should not to mask at all */
+    /** Q 3: The default should not to mask at all */
     implicit def noMask[A]: Mask[A] =
       ???
   }
 
-  /** Q: We should have nice syntax */
+  /** Q 4: We should have a nice syntax */
+  implicit class MaskSyntax[A](a: A) {
+    def disclose: String =
+      ???
+  }
 }
 
 /** Client side code */
 object client extends App {
 
   import library._
-
-  /** Q: implement a client side explicit implicit parameter syntax */
-  def methodUsingMaskExplicitly[A](a: A)(implicit mask: Mask[A]): String =
-    ???
-
-  /** Q: Implement a client side implicit implicit parameter syntax */
-  def methodUsingMaskImplicitly[A : Mask](a: A): String =
-    ???
 
   // Client side domain
   case class BankNumber(str: String)
