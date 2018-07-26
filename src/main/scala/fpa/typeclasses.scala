@@ -8,19 +8,14 @@ object library {
     def disclose(a: A): String
   }
 
-  /** Type class companion object containing default Mask instances */
+  /** Type class companion objects contain default Mask instances */
   object Mask {
-
-    /** The default is not to mask at all */
-    implicit def noMask[A]: Mask[A] = new Mask[A] {
-      def disclose(a: A): String = a.toString
-    }
+    /** Q: The default should not to mask at all */
+    implicit def noMask[A]: Mask[A] =
+      ???
   }
 
-  implicit class MaskSyntax[A : Mask](a: A) {
-    val disclose: String =
-      implicitly[Mask[A]].disclose(a)
-  }
+  /** Q: We should have nice syntax */
 }
 
 /** Client side code */
@@ -28,28 +23,26 @@ object client extends App {
 
   import library._
 
-  // Client side explicit implicit parameter syntax
+  /** Q: implement a client side explicit implicit parameter syntax */
   def methodUsingMaskExplicitly[A](a: A)(implicit mask: Mask[A]): String =
-    mask.disclose(a)
+    ???
 
-  // Client side implicit implicit parameter syntax
+  /** Q: Implement a client side implicit implicit parameter syntax */
   def methodUsingMaskImplicitly[A : Mask](a: A): String =
-    implicitly[Mask[A]].disclose(a)
+    ???
 
   // Client side domain
   case class BankNumber(str: String)
   object BankNumber {
-    implicit val maskBankNumber: Mask[BankNumber] = new Mask[BankNumber] {
-      override def disclose(a: BankNumber): String =
-        "BankNumber(masked)"
-    }
+    /** BankNumbers should be masked as `BankNumber(masked)` */
+    implicit def maskBankNumber: Mask[BankNumber] =
+      ???
   }
   case class Customer(name: String, bankNumber: BankNumber)
   object Customer {
-    implicit def maskCustomer(implicit bankNumberMask: Mask[BankNumber]): Mask[Customer] = new Mask[Customer] {
-      override def disclose(customer: Customer): String =
-        s"Customer(${customer.name},${bankNumberMask.disclose(customer.bankNumber)})"
-    }
+    /** Customers should mask the contained BankNumber */
+    implicit def maskCustomer(implicit bankNumberMask: Mask[BankNumber]): Mask[Customer] =
+      ???
   }
 
 }
