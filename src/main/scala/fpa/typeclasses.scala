@@ -10,24 +10,31 @@ object library {
 
   /** Q 1: implement a client side explicit implicit parameter syntax */
   def methodUsingMaskExplicitly[A](a: A)(implicit mask: Mask[A]): String =
-    ???
+    mask.disclose(a)
 
   /** Q 2: Implement a client side implicit implicit parameter syntax */
   def methodUsingMaskImplicitly[A : Mask](a: A): String =
-    ???
+    implicitly[Mask[A]].disclose(a)
 
 
   /** Type class companion objects contain default Mask instances */
   object Mask {
     /** Q 3: The default should not to mask at all */
     implicit def noMask[A]: Mask[A] =
-      ???
+      (a: A) => {
+        println("noMask")
+        a.toString
+      }
+
   }
 
   /** Q 4: We should have a nice syntax */
-  implicit class MaskSyntax[A](a: A) {
-    def disclose: String =
-      ???
+  implicit class MaskSyntax[A : Mask](a: A) {
+    def disclose: String = {
+      println("MaskSyntax.disclose")
+      implicitly[Mask[A]].disclose(a)
+    }
+
   }
 }
 
@@ -39,15 +46,22 @@ object client extends App {
   // Client side domain
   case class BankNumber(str: String)
   object BankNumber {
-    /** BankNumbers should be masked as `BankNumber(masked)` */
-    implicit def maskBankNumber: Mask[BankNumber] =
-      ???
+    /** Q 5: BankNumbers should be masked as `BankNumber(masked)` */
+    implicit def maskBankNumber: Mask[BankNumber] = {
+      _ => {
+        println("maskBankNumber")
+        "BankNumber(masked)"
+      }
+    }
   }
   case class Customer(name: String, bankNumber: BankNumber)
   object Customer {
-    /** Customers should mask the contained BankNumber */
+    /** Q 6: Customers should mask the contained BankNumber */
     implicit def maskCustomer(implicit bankNumberMask: Mask[BankNumber]): Mask[Customer] =
-      ???
+      (customer: Customer) => {
+        println("maskCustomer")
+        s"Customer(${customer.name.disclose},${customer.bankNumber.disclose})"
+      }
   }
 
 }
