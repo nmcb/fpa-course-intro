@@ -10,3 +10,10 @@ lazy val `fpa-course-intro` = (project in file(".")).
     name := "fpa-course-intro",
     libraryDependencies += scalaTest % Test
   )
+
+scalacOptions := Seq(
+  "-unchecked",
+  "-deprecation",
+  "-feature",
+  "-language:higherKinds"
+)
