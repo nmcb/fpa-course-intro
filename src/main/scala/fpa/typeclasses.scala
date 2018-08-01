@@ -44,11 +44,11 @@ object client extends App {
     implicit def maskBankNumber: Mask[BankNumber] =
       ???
   }
+
   case class Customer(name: String, bankNumber: BankNumber)
   object Customer {
     /** Q 6: Customers should mask the contained BankNumber */
     implicit def maskCustomer(implicit bankNumberMask: Mask[BankNumber]): Mask[Customer] =
       ???
   }
-
 }
