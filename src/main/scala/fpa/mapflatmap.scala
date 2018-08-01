@@ -1,7 +1,7 @@
 package fpa
 package mapflatmap
 
-/** This material is intended to explain what is generic about the application
+/** This chapter is intended to explain what is generic about the application
   * of the `map` and `flatMap` functions when defined for all the different
   * types that support them.  You'll probably know for example that the
   * `Option[A]` and `List[A]` types have a Scala library implementation of
@@ -34,17 +34,11 @@ object library {
 
   /** Q1: Implement a naive map on options with a pattern match on `oa`. */
   def fmapOption[A, B](f: A => B)(oa: Option[A]): Option[B] =
-    oa match {
-      case None => None
-      case Some(a) => Some(f(a))
-    }
+    ???
 
   /** Q2: Implement a naive map on lists with a pattern match on `la`. */
   def fmapList[A, B](f: A => B)(la: List[A]): List[B] =
-    la match {
-      case Nil => Nil
-      case a :: as => f(a) :: fmapList(f)(as)
-    }
+    ???
 
   trait Map[M[_]] {
     def fmap[A, B](f: A => B)(ma: M[A]): M[B]
@@ -52,29 +46,27 @@ object library {
 
   /** Q3: Implement an option and list instance for the `Map` type class. */
   object Map {
-    implicit val listMap: Map[List] = new Map[List] {
-      def fmap[A, B](f: A => B)(ma: List[A]): List[B] =
-        fmapList(f)(ma)
-    }
-    implicit val optionMap: Map[Option] = new Map[Option] {
-      def fmap[A, B](f: A => B)(ma: Option[A]): Option[B] =
-        fmapOption(f)(ma)
-    }
+    implicit val listMap: Map[List] =
+      ???
+
+    implicit val optionMap: Map[Option] =
+      ???
   }
 
   /** Q4: Create a syntax for the `Map` type class. */
-  implicit class MapSyntax[M[_], A](ma: M[A])(implicit instance: Map[M]) {
-    def fmap[B](f: A => B): M[B] =
-      instance.fmap(f)(ma)
-  }
+  // Hint: you want an implicit class that wraps a generic `M[A]` type class
+  // instance.  These instances are of kind `* -> *` which means that they
+  // take a type to become a concrete type.  Or in other words, they are
+  // are type constructors.  `List[A]` and `Option[A]` are both type
+  // constructors as they take one concrete type for type parameter `A`.
+  //
+  // `implicit class MapOps[M[_], A]` ...
 
   /** Q5: Implement a `Map` instance for your own data type */
   case class Pair[A](a1: A, a2: A)
   object Pair {
-    implicit val pairMap: Map[Pair] = new Map[Pair] {
-      def fmap[A, B](f: A => B)(ma: Pair[A]): Pair[B] =
-        Pair(f(ma.a1), f(ma.a2))
-    }
+    implicit val pairMap: Map[Pair] =
+      ???
   }
 
   /** Q6 - Q8: Implement the same functionality for type class `FlatMap`. */
@@ -83,33 +75,17 @@ object library {
   }
 
   object FlatMap {
-    implicit val listFlatMap: FlatMap[List] = new FlatMap[List] {
-      def bind[A, B](ma: List[A])(f: A => List[B]): List[B] =
-        ma match {
-          case Nil     => Nil
-          case a :: as => f(a) ++ bind(as)(f)
-        }
-    }
-    implicit val optionFlatMap: FlatMap[Option] = new FlatMap[Option] {
-      def bind[A, B](ma: Option[A])(f: A => Option[B]): Option[B] =
-        ma match {
-          case None    => None
-          case Some(a) => f(a)
-        }
-    }
-    implicit val pairFlatMap: FlatMap[Pair] = new FlatMap[Pair] {
-      override def bind[A, B](ma: Pair[A])(f: A => Pair[B]): Pair[B] = {
-        val Pair(b1, _) = f(ma.a1)
-        val Pair(_, b2) = f(ma.a2)
-        Pair(b1, b2)
-      }
-    }
+    implicit val listFlatMap: FlatMap[List] =
+      ???
+
+    implicit val optionFlatMap: FlatMap[Option] =
+      ???
+
+    implicit val pairFlatMap: FlatMap[Pair] =
+      ???
   }
 
-  implicit class FlatMapOps[M[_], A](ma: M[A])(implicit evidence: FlatMap[M]) {
-    def bind[B](f: A => M[B]): M[B] =
-      evidence.bind(ma)(f)
-  }
+  // `implicit class FlatMapOps[M[_], A]` ...
 
   /** Q9: (Bonus)
     *
