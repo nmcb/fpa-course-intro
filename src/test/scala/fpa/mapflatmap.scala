@@ -32,16 +32,32 @@ class MapAndFlatMapSpec extends FlatSpec with Matchers {
   }
 
   it should "Q5: The `Map` type class allow instances for own data types" in {
-    Pair(1, 2).fmap(_.toString) shouldBe Pair("1", "2")
+    """
+      | Pair(1, 2).fmap(_.toString) shouldBe Pair("1", "2")
+    """.stripMargin should compile
+
+    // And it should also work, so uncomment the line below as soon as it's compile ...
+    // Pair(1, 2).fmap(_.toString) shouldBe Pair("1", "2")
   }
 
   it should "Q6: The `FlatMap` type class have list and option instances in scope" in {
-    List("0", "1", "2", "3").flatMap(s => List(s.toInt)) shouldBe List(0, 1, 2, 3)
-    Option("0").flatMap(s => Some(s.toInt)) shouldBe Some(0)
+    """
+      | List("0", "1", "2", "3").bind(s => List(s.toInt)) shouldBe List(0, 1, 2, 3)
+      | Option("0").bind(s => Some(s.toInt)) shouldBe Some(0)
+    """.stripMargin should compile
+
+    // And it should also work, so uncomment the lines below as soon as the above compiles ...
+    // List("0", "1", "2", "3").bind(s => List(s.toInt)) shouldBe List(0, 1, 2, 3)
+    // Option("0").bind(s => Some(s.toInt)) shouldBe Some(0)
   }
 
   it should "Q7: The `FlatMap` type class allows instances for new data type" in {
-    Pair(1, 2).bind(i => Pair(i.toString, i.toString)) shouldBe Pair("1", "2")
+    """
+      | Pair(1, 2).bind(i => Pair(i.toString, i.toString)) shouldBe Pair("1", "2")
+    """.stripMargin should compile
+
+    // And it should also work, so uncomment the line below as soon as the above compiles ...
+    // Pair(1, 2).bind(i => Pair(i.toString, i.toString)) shouldBe Pair("1", "2")
   }
 
   it should "Q8: The `FlatMap` syntax implicitly resolves on all types of kind `* -> *`" in {
