@@ -20,3 +20,10 @@ sbt:fpa-course-intro> ~test
 [success] Total time: 1 s, completed Jul 26, 2018 10:01:58 AM
 1. Waiting for source changes... (press enter to interrupt)
 ```
+---
+
+## History
+
+- 2018-07-19 : Kick Off
+- 2018-07-26 : Type Classes
+- 2018-08-02 : Map and FlatMap
