@@ -3,6 +3,57 @@ package properties
 package test
 
 import org.scalacheck._
+import org.scalatest.prop.Tables.Table
+
+object PropertiesSpec extends Properties("Properties") {
+
+  import Prop._
+
+  /** Q1: Implement the property test for ... */
+  property("list == list.reverse.reverse") =
+    forAll { (l: List[Int]) =>
+      l == l.reverse.reverse
+    }
+
+  /** Q2: Implement a more precise property to show that ... */
+  property("list.head == list.reverse.last") =
+    forAll { (l: List[Int]) =>
+      l.headOption == l.reverse.lastOption
+    }
+
+  /** Q3: Implement the property test for ... */
+  property("plus on doubles is associative") =
+    forAll { (d1: Double, d2: Double, d3: Double) =>
+      (d1 + d2) + d3 == d1 + (d2 + d3)
+    }
+
+  /** Q4: See if you can devise a more precise property that holds for ... */
+  property("times and division on doubles are each others complement") =
+    forAll { (m: Double, n: Double) =>
+      // No, you cannot
+      m == 0 || n == 0 || m * n / n == m
+  }
+
+  /** This may go wrong when using doubles to represent money, so let's define ... */
+  type Money = BigDecimal
+  object Money {
+    val Zero = BigDecimal(0)
+  }
+
+  /** We can create value generators from the `Gen._` utility functions */
+  val genLessThanOneMillionEuro: Gen[Money] =
+    Gen.choose[Int](0, 99999999).map(i => BigDecimal(i) / 100)
+
+  /** Q5: See if you can devise a more precise property that holds for ... */
+  property("times and division on big decimals < 1000000 && >= 0 are each others complement") =
+    forAll (genLessThanOneMillionEuro, genLessThanOneMillionEuro) { (m: Money, n: Money) =>
+        m == 0 || n == 0 || m * n / n == m
+    }
+
+  case class Product(name: String, price: Money)
+  case class Order(lines: List[Product]) {
+    def total: Money = lines.map(_.price).foldLeft(Money.Zero)(_+_)
+  }
 
 //object PropertiesSpec extends Properties("Properties") {
 //
