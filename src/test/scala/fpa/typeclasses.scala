@@ -7,8 +7,9 @@ import java.util.UUID
 import org.scalatest._
 import library._
 
-class MaskSpec extends FlatSpec with Matchers {
-
+//@Ignore
+//class MaskSpec extends FlatSpec with Matchers {
+//
 //  "The Mask type class" should "default to disclosing everything" in {
 //    implicitly[Mask[String]].disclose("<any-string>") should be ("<any-string>")
 //    implicitly[Mask[Int]].disclose(666) should be ("666")
@@ -38,4 +39,6 @@ class MaskSpec extends FlatSpec with Matchers {
 //    """Customer("Name", BankNumber("1234567890")).disclose""" should compile
 //    Customer("Name", BankNumber("1234567890")).disclose should be ("Customer(Name,BankNumber(masked))")
 //  }
-}
+//}
+
+object MaskSpec

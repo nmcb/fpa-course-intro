@@ -8,8 +8,10 @@ lazy val `fpa-course-intro` = (project in file(".")).
       version      := "0.1.0"
     )),
     name := "fpa-course-intro",
-    libraryDependencies += scalaTest % Test
-  )
+    libraryDependencies ++= Seq(
+      scalaTest  % Test,
+      scalaCheck % Test
+    ))
 
 scalacOptions := Seq(
   "-unchecked",
