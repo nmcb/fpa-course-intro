@@ -65,45 +65,31 @@ object validation {
   import domain._
 
   /** Q1: Decode address as a trimmed (non-empty) string value. Hint, see `Validated.toValidatedNel` */
-  implicit val addressDecoder: Decoder[Address] = (str: String) => (
-    if (str.trim.nonEmpty) valid(Address(str.trim))
-    else invalid("Empty address line")
-    ).toValidatedNel
+  implicit val addressDecoder: Decoder[Address] = (str: String) =>
+    ???
 
   /** Q2: Decode postal code as a trimmed upper cased (non-empty) value. */
-  implicit val postalCodeDecoder: Decoder[PostalCode] = (str: String) => (
-    if (str.trim.nonEmpty) valid(PostalCode(str.trim.toUpperCase))
-    else invalid("Empty postal code")
-    ).toValidatedNel
+  implicit val postalCodeDecoder: Decoder[PostalCode] = (str: String) =>
+    ???
 
   /** Q3: Decode name as comma separated first- and last-name string values, both mandatory and trimmed */
   implicit val nameDecoder: Decoder[Name] = (str: String) =>
-    (str.split(',').map(_.trim) match {
-      case Array(last, first) if last.nonEmpty && first.nonEmpty => valid(Name(first, last))
-      case _ => invalid(s"Invalid name: '$str'")
-    }).toValidatedNel
+    ???
 
   /** Q4: Decode phone numbers as trimmed sequences of numbers, `-` and ` ` characters removed,
     * numbers starting with a `+` and the following two digits should be decoded as country.
     * E.g. 0612345 -> Phone(None, "0612345") and +31612345 -> Phone(Some("+31"), "612345")
     */
   implicit val phoneDecoder: Decoder[Phone] = (str: String) =>
-    (str.trim.replaceAll("\\-|\\ ", "") match {
-      case PhonePattern(code, number) => valid(Phone(Option(code), number))
-      case _ => invalid(s"Invalid phone number: '$str'")
-    }).toValidatedNel
+    ???
 
   /** Q5: Decode debit value currencies as Scala doubles, i.e. `String.toDouble` */
   implicit val debitDecoder: Decoder[Debit] = (str: String) =>
-    Try(valid(Debit(str.trim.toDouble)))
-      .getOrElse(invalid(s"Invalid debit value: '$str'"))
-      .toValidatedNel
+    ???
 
   /** Q6: Decode birthday values according to format `dd/MM/yyyy` */
   implicit val birthDayDecoder: Decoder[BirthDay] = (str: String) =>
-    Try(valid(BirthDay(LocalDate.parse(str.trim, BirthDayPattern))))
-      .getOrElse(invalid(s"Invalid birthday: '$str'"))
-      .toValidatedNel
+    ???
 
   /** You will have noted that although each decoder above may return only one
     * error at a time, we still allowed the result of a decoder to hold multiple
@@ -123,14 +109,7 @@ object validation {
   implicit val debitRecordDecoder: Decoder[DebitRecord] =
     (str: String) => str match {
       case RecordPattern(c1, c2, c3, c4, c5, c6) =>
-        Apply[ValidatedNel[Error, ?]].map6(
-          c1.as[Name],
-          c2.as[Address],
-          c3.as[PostalCode],
-          c4.as[Phone],
-          c5.as[Debit],
-          c6.as[BirthDay]
-        ) { case (nm, ad, pc, ph, cr, bd) => DebitRecord(nm, ad, pc, ph, cr, bd) }
+        ???
       case _ =>
         invalidNel(s"Invalid line pattern `${RecordPattern.regex}`: '$str'")
     }
