@@ -1,7 +1,9 @@
 import Dependencies._
 
 lazy val mainDependencies = Seq(
-  catsCore
+  catsCore,
+  catsEffect,
+  fastparse
 )
 
 lazy val testDependencies = Seq(
