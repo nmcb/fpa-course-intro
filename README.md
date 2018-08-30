@@ -27,7 +27,10 @@ The tests associated which each individual chapter are configured to be ignored.
 
 ## History
 
-- 2018-07-19 : Kick Off
-- 2018-07-26 : Type Classes
-- 2018-08-02 : Map and FlatMap
-- 2018-08-09 : Properties
+2018-07-19 : Kick Off
+2018-07-26 : Type Classes
+2018-08-02 : Map and FlatMap
+2018-08-09 : Properties
+2018-08-16 : Validation
+2018-08-23 : Cats Run Through
+2018-08-30 : IO Monad
