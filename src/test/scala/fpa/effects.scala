@@ -3,10 +3,7 @@ package effects
 package test
 
 import java.io.ByteArrayInputStream
-
 import org.scalatest._
-
-import scala.io.StdIn
 import scala.util.Success
 
 class EffectsSpec extends FlatSpec with Matchers {
