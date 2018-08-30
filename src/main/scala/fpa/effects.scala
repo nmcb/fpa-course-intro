@@ -5,6 +5,7 @@ import cats._
 import implicits._
 import effect._
 
+import scala.concurrent.Future
 import scala.io.StdIn
 
 object intro extends App {
@@ -82,25 +83,41 @@ object io extends App {
   // def readCelcius
   // def writeFarenheit(f: Double)
 
-  /**
-    * `MonadError` provides methods to handle exceptions in a monadic side channel :
+  /** `MonadError` provides methods to handle exceptions in a monadic side channel :
     *
     * - attempt[A](fa: F[A]): F[Either[E, A]]
     * - raiseError[A](e: E): F[A]
     * - handleError[A](fa: F[A])(f: (E) ⇒ A): F[A]
     * - handleErrorWith[A](fa: F[A])(f: (E) ⇒ F[A]): F[A]
     * - adaptError[A](fa: F[A])(pf: PartialFunction[E, E]): F[A]
-    *
     **/
 
   /** Q3: Handle the div by zero case by returning `Double.NaN`. */
   def inverse1(d: Double): IO[Double] = for {
-    inverse <- (1 / d)
+    inverse <- IO (1 / d)
   } yield inverse
 
   /** Q4: Handle the div by zero case by transforming into a user specific exception. */
   case class NoInverse(msg: String = "value has no inverse") extends RuntimeException(msg)
   def inverse2(d: Double): IO[Double] = for {
-    inverse <- (1 / d)
+    inverse <- IO (1 / d)
   } yield inverse
+
+  /** Sometimes we need the pure, referentially transparent IO expressions of our core code-
+    * base, to interact with legacy frameworks, probably requiring the evaluation of those
+    * expressions to be returned as `Future`s.
+    **/
+
+  /** Q5: Read the Cats IO docs (https://tinyurl.com/y7lznf6h) and implement `client.name()` */
+  object core {
+    def promptName: IO[String] = for {
+      _    <- IO(println("What's your name?"))
+      name <- IO(StdIn.readLine().trim)
+    } yield name
+  }
+  object client {
+    import core._
+    def name(): Future[String] =
+      ???
+  }
 }
