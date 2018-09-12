@@ -72,10 +72,10 @@ boys :: [Boy]
 boys =  [Matthew, Peter, Jack, Arnold, Carl]
 
 
--- This defines the function value `accusses` to encode whether given
--- first argument `Boy` accuses given second argument `Boy`.  Imp-
--- lement this function according to the stated crime investigation
--- case above.
+-- This defines the function value `accuses` to encode whether given
+-- first argument `Boy` accuses given second argument `Boy`.  Encode
+-- this function according to the stated crime investigation case
+-- depicted above.
 --
 -- Q1: Implement `accuses` by means of pattern matching.
 accuses :: Boy -> Boy -> Bool
@@ -83,7 +83,7 @@ accuses =  undefined
 
 -- This defines the function value `accusers` to encode which `[Boy]`s
 -- accuse given argument `Boy`.  I.e. the function returns the list of
--- boys that accuse the function's given boy.
+-- boys that accuse the boy this function value is applied to.
 --
 -- Q2: Implement `accusers` by means of a filtering list-comprehension.
 accusers :: Boy -> [Boy]
@@ -93,17 +93,17 @@ accusers =  undefined
 -- that is guilty of the crime.  I.e. the exercise is defined in terms
 -- of accusations such that `guilty` can be expected to be a singleton
 -- list that contains the culprit of the theft provided that three boys
--- accuse any known boy.
+-- accuse that boy.
 --
 -- Q3: Implement `quilty` by means of a filtering list-comprehension.
 guilty :: [Boy]
 guilty =  undefined
 
 -- This defines the value `honest` which encodes the list of `[Boy]`s
--- that answer accuse truthfully.  I.e. the list of boys who made
--- honest (true) statements.  Hint, re-use `quilty` to calculate they
+-- that answer `accuse` truthfully.  I.e. the list of boys who made
+-- honest (true) statements.  Hint, re-use `guilty` to calculate the
 -- value.
 --
--- Q4: Implement `honest` as a combination of `quilty` and `accusers`
+-- Q4: Implement `honest` as a combination of `guilty` and `accusers`
 honest :: [Boy]
 honest =  undefined
