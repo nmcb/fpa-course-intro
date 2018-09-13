@@ -107,3 +107,113 @@ guilty =  undefined
 -- Q4: Implement `honest` as a combination of `guilty` and `accusers`
 honest :: [Boy]
 honest =  undefined
+
+
+{- *** Minimal encoding ***
+--
+data Boy = Matthew | Peter | Jack | Arnold | Carl
+           deriving (Eq,Show)
+
+boys :: [Boy]
+boys = [Matthew, Peter, Jack, Arnold, Carl]
+
+accuses              :: Boy -> Boy -> Bool
+accuses Matthew boy  =  (boy /= Carl)              &&  (boy /= Matthew)
+accuses Peter   boy  =  (boy == Matthew)           ||  (boy == Jack)
+accuses Jack    boy  =  not (accuses Matthew boy)  &&  not (accuses Peter boy)
+accuses Arnold  boy  =  (accuses Matthew boy)      /=  (accuses Peter boy)
+accuses Carl    boy  =  not (accuses Arnold boy)
+
+accusers         :: Boy -> [Boy]
+accusers accusee =  [b | b <- boys, accuses b accusee]
+
+guilty :: [Boy]
+guilty =  [boy | boy <- boys, length (accusers boy) == 3]
+
+honest :: [Boy]
+honest =  accusers (head guilty)
+-}
+
+{- *** Generative encoding ***
+--
+data Boy = Matthew | Peter | Jack | Arnold | Carl
+           deriving (Ord,Eq,Show)
+
+boys :: [Boy]
+boys =  [Matthew, Peter, Jack, Arnold, Carl]
+
+accuses              :: Boy -> Boy -> Bool
+accuses Matthew boy  =  (boy /= Carl)              &&  (boy /= Matthew)
+accuses Peter   boy  =  (boy == Matthew)           ||  (boy == Jack)
+accuses Jack    boy  =  not (accuses Matthew boy)  &&  not (accuses Peter boy)
+accuses Arnold  boy  =  (accuses Matthew boy)      /=  (accuses Peter boy)
+accuses Carl    boy  =  not (accuses Arnold boy)
+
+accusers      :: Boy -> [Boy]
+accusers boy  =  [accuser | accuser <- boys
+                          , (boy /= accuser) && (accuses accuser boy)]
+
+guilty  :: [Boy]
+guilty  =  [culprit | triple  <- nub $ map sort $ map (take 3) (permutations boys)
+                    , culprit <- boys
+                    , all (\snitch -> elem snitch (accusers culprit)) triple]
+
+honest  :: [Boy]
+honest  =  filter (\snitch -> accuses snitch culprit) boys where [culprit] = guilty
+-}
+
+{- *** Overly generative encoding ***
+--
+data Boy = Matthew | Peter | Jack | Arnold | Carl
+           deriving (Eq,Show)
+
+boys :: [Boy]
+boys =  [Matthew, Peter, Jack, Arnold, Carl]
+
+xor         :: Bool -> Bool -> Bool
+xor True  x =  not x
+xor False x =  x
+
+biconditional             :: Bool -> Bool -> Bool
+biconditional True  True  =  True
+biconditional True  False =  False
+biconditional False True  =  False
+biconditional False False =  True
+
+accuses                 :: Boy -> Boy -> Bool
+accuses Matthew accusee =  not (elem accusee [Carl, Matthew])
+accuses Peter   accusee =  elem accusee [Matthew, Jack]
+accuses Jack    accusee =  not (accuses Matthew accusee) && not (accuses Peter accusee)
+accuses Arnold  accusee =  (accuses Matthew accusee) `xor` (accuses Peter accusee)
+accuses Carl    accusee =  not (accuses Arnold accusee)
+
+accusers         :: Boy -> [Boy]
+accusers accusee =  [b | b <- boys, accuses b accusee]
+
+rmdups        :: Eq a => [a] -> [a]
+rmdups        =  []
+rmdups (x:xs) =  x : filter (/= x) (rmdups xs)
+
+statements :: [Bool]
+statements =  [True, True, True, False, False]
+
+type TruthConfiguration = [(Boy, Bool)]
+
+-- List of possible configurations when 3 boys are speaking the truth and 2 boys are lying
+truthConfigurations :: [TruthConfiguration]
+truthConfigurations =  [zip boys permutation | permutation <- (rmdups (permutations statements))]
+
+-- For every configuration we get a list of accused boys per boy. The intersect of these list should be the thief
+thiefAccordingToTruthConfiguration    :: TruthConfiguration -> [Boy]
+thiefAccordingToTruthConfiguration tc =  foldl1 intersect [[b2 | b2 <- boys, biconditional (accuses b1 b2) t] | (b1, t) <- tc]
+
+-- We flatten the lists of intersections
+guilty :: [Boy]
+guilty =  concat (map thiefAccordingToTruthConfiguration truthConfigurations)
+
+-- This is a lot of code but it really just gets the boys that are speaking the truth from the winning game configuration
+honest :: [Boy]
+honest =  map fst (filter ((==True).snd) winningTruthConfiguration) where
+            winningTruthConfiguration    =  head (map fst (filter ((/=[]).snd) truthConfigurationsAndThiefs))
+            truthConfigurationsAndThiefs =  zip truthConfigurations (map thiefAccordingToTruthConfiguration truthConfigurations)
+-}
