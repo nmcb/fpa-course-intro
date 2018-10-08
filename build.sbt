@@ -1,5 +1,7 @@
 import Dependencies._
 
+scalaVersion := "2.12.7"
+
 lazy val mainDependencies = Seq(
   catsCore,
   catsEffect,

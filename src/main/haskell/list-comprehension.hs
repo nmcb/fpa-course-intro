@@ -79,7 +79,7 @@ boys =  [Matthew, Peter, Jack, Arnold, Carl]
 --
 -- Q1: Implement `accuses` by means of pattern matching.
 accuses :: Boy -> Boy -> Bool
-accuses =  undefined
+accuses undefined
 
 -- This defines the function value `accusers` to encode which `[Boy]`s
 -- accuse given argument `Boy`.  I.e. the function returns the list of

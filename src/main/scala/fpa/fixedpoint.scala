@@ -1,20 +1,20 @@
 package fpa
 
-object fixpoint {
+object fixpoint extends App {
 
-  /*** Fixpoints at Value Level ***/
+  /*** Fixed Points at Value Level ***/
 
   /**
     *  Let us try to factor out the recursive part of a function.
     */
-  def facRec: Int => Int =
+  val facRec: Int => Int =
     (n: Int) =>
       if (n == 0) 1 else n * facRec(n - 1)
 
   /**
     *  Replace the recursive call with a higher order function parameter.
     */
-  def facLike: (Int => Int) => (Int => Int) =
+  val facLike: (Int => Int) => (Int => Int) =
     (f: Int => Int) =>
       (n: Int) =>
         if (n == 0) 1 else n * f(n - 1)
@@ -29,45 +29,44 @@ object fixpoint {
     *  Then it's easy to see that passing facLib as f is also factorial.
     */
   def alsoFac1: Int => Int =
-    (n: Int) =>
-      facLike(facLib)(n)           // Proof by substitution.
+    facLike(facLib)  // Proof by substitution.
 
   /**
-    *  Thus, could we define alsoFac as a recursive curried parameter?
+    *  Thus, could we define factorial as a recursive curried parameter?
     */
-  def alsoFac2: Int => Int =
+  val alsoFac2: Int => Int =
     (n: Int) =>
-      facLike(alsoFac2)(n)		     // Yes! (But we need a lambda).
+      facLike(alsoFac2)(n) // Yes! (But we need a lambda). [see line 69]
 
   /**
-    *  Let's define a utility function.
+    *  Let's define a utility method.
     */
   def id[A]: A => A =
-    (a: A) => a                    // Identity.
+    a => a  // Identity.
 
   /**
     *  Which makes it possible to calculate factorial for n <= 0
     */
-  def facUpTo0: Int => Int =
-    facLike(id)                    // But without a recursive call!
+  val facUpTo0: Int => Int =
+    facLike(id)  // And ... without a recursive call!
 
   /**
     *  Therefor we could "stack" the recursion explicitly for n <= 1.
     */
-  def facUpTo1: Int => Int =
-    facLike(facUpTo0)		 			     // Note, still no recursive call!
+  val facUpTo1: Int => Int =
+    facLike(facUpTo0)  // Note, still no recursive call!
 
   /**
     *  And for n <= 2 ... etc., going up towards infinity.
     */
-  def facUpTo2: Int => Int =
+  val facUpTo2: Int => Int =
     facLike(facUpTo1)
 
   /**
     *  We could now "conceptually" define the fixpoint of facLike as:
     */
-  def factorialUpToInfinity: Int => Int =
-    facLike(factorialUpToInfinity) // Which never terminates ...
+  val factorialUpToInfinity: Int => Int =
+    facLike(factorialUpToInfinity) // Which never terminates [see line 39]
 
   /**
     *  Interlude: A fixed point of a function is the return value of
@@ -83,28 +82,30 @@ object fixpoint {
 
 
   /**
-    *  Thus: Let's derive the (untyped) Y-Combinator for this:
+    *  Let's derive a function that calculates a function fixpoint, e.g.:
     *
-    *  (Y f) == fixpoint-of-f                       --by definition
+    *               Let's derive the (untyped) Y-Combinator
     *
-    *  (f fixpoint-of-f) == fixpoint-of-f           --by definition
+    *  Y(f) == fixpoint-of-f                       --by definition (our definition)
     *
-    *  (Y f) == fixpoint-of-f == (f fixpoint-of-f)  --by equality
+    *  f(fixpoint-of-f) == fixpoint-of-f           --by definition (the definition)
     *
-    *  (Y f) == (f (Y f))                           --by substitution
+    *  Y(f) == fixpoint-of-f == f(fixpoint-of-f)   --by equality
+    *
+    *  Y(f) == f(Y(f))                             --by substitution
     *
     *  Voila!
     */
 
 
   /**
-    *  Typed, we need Y to accept a function:
+    *  Typed (fortunately) we need Y to accept a function:
     *
     *  a)  That takes a function of A to A to a function of A to A.
     *
     *  b)  So we can return a function from A to A.
     *
-    *  Note that the input's function type is, itself, the return type.
+    *  Note that the input's function type is, itself, formed as the return type.
     */
   def Y[A]: ((A => A) => (A => A)) => (A => A) =
     (f: (A => A) => (A => A)) =>
@@ -114,30 +115,30 @@ object fixpoint {
   /**
     *  So we compose the fixpoint of facLike, thus defining factorial!
     */
-  def fixFac: Int => Int =
+  val fixFac: Int => Int =
     Y(facLike)
 
 
 
-  /*** Fixpoints at Type Level ***/
+  /*** Fixed Points at Type Level ***/
 
   import scala.language.higherKinds
 
   /**
-    *  Let's start with defining a _value_ level fixpoint for some F.
+    *  Let's start with defining a _type_ level fixpoint for some F.
     */
   case class Fix[F[_]](f: F[Fix[F]])
 
   /**
-    *  And try to use that implementing a generic (non-recursive) ADT.
+    *  And try to use that implementing a generic (non-recursive) List-ADT.
     */
-  trait ListLike[+A, +S]
-  case class ConsLike[A, +S](a: A, as: S) extends ListLike[A, S]
+  trait ListLike[+A, +LL]
+  case class ConsLike[A, +LL](a: A, as: LL) extends ListLike[A, LL]
   trait NilLike extends ListLike[Nothing, Nothing]
   object NilLike extends NilLike
 
   /**
-    *  This means we need to be able to fix that type's point and
+    *  This means we need to be able to fix that ADT type's point and
     *  a means to encode the two constructor functions that allow us to
     *  construct a List in terms of a fixpoint calculation.
     */
@@ -164,22 +165,30 @@ object fixpoint {
   case class IFix[F[_], R <: Inductive](f: F[R]) extends Inductive
 
   /**
-    *  Note 1)  Since R has kind, we have recursion at the type level.  So
-    *           contrarily to Fix, not every element in the recursion have
-    *           the same type.
-    *
-    *  Note 2)  At some point we'll need to stop the recursion. The INil
-    *           will have no inhabitant, and just serves that purpose.
+    *  Remember `case class Fix[F[_]](f: F[Fix[F]])`, well in `IFix` above
+    *  we took the type application `Fix[F]` out of `f`s type, into a separate
+    *  type parameter, `R`, which itself inherits from an "`Inductive`" sequence
+    *  of inner `IFix`s, that terminate in a type level `INil`.
     */
 
   /**
-    *  Now how does this help us implementing HList?  Well, here it becomes
-    *  really cool.  You see, the only difference between a List and a HList
-    *  is the recursion scheme.  A HList is recursive at both the type and
-    *  value level at the same time, while a List is only recursive at the
-    *  value level.  Apart from that, they are the same.  Therefore, we can
-    *  reuse the previously defined Nil and Cons, and we just have to provide
-    *  new constructors.
+    *  Note 1)  Since R is of kind `*` we have recursion at the type level. So
+    *           contrarily to Fix, in IFix not every element in the recursion
+    *           needs to be of the same type.
+    *
+    *  Note 2)  At some point we'll need to stop the recursion. The INil
+    *           will have no inhabitant (inherited class or object) and
+    *           just serves for that purpose.
+    */
+
+  /**
+    *  Now how does this help us implementing a HList?  Well, here it becomes
+    *  really abstract.  You see, the only difference between a List and a
+    *  HList is the recursion scheme.  A HList is recursive at both the type and
+    *  value level at the same time, while a List is only recursive at the value
+    *  level.  Apart from that, they are the same.  Therefore, we can reuse the
+    *  previously defined NilLike and ConsLike, and we just have to provide new
+    *  constructors.
     */
   type HNil =
     IFix[ListLike[NilLike, ?], INil]
@@ -197,8 +206,10 @@ object fixpoint {
     *  With that we can create proper heterogeneous lists, e.g.:
     */
   val hs: Int :: String :: HNil =
-    hcons(1, hcons("bar", hnil))
+    hcons(1, hcons("one", hnil))
 
-  val is: Int :: String :: Int :: HNil =
-    hcons(1, hcons("str", hcons(3, hnil)))
+  val yeah: Seq[Int :: String :: HNil] = // <- look mama, without hands!
+    Seq(hs)
+
+  println(alsoFac2(3))
 }
