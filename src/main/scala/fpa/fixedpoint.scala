@@ -126,20 +126,23 @@ object fixpoint extends App {
 
   /**
     *  Let's start with defining a _type_ level fixpoint for some F.
+    *  Here `F` is a type constructor of kind `* -> *` in which the
+    *  type parameter represents function `F`'s input and the resulting
+    *  `Fix[F[A]]` a fixpoint output "type".
     */
   case class Fix[F[_]](f: F[Fix[F]])
 
   /**
     *  And try to use that implementing a generic (non-recursive) List-ADT.
     */
-  trait ListLike[+A, +LL]
-  case class ConsLike[A, +LL](a: A, as: LL) extends ListLike[A, LL]
+  trait ListLike[+A, +T]
+  case class ConsLike[A, +T](a: A, as: T) extends ListLike[A, T]
   trait NilLike extends ListLike[Nothing, Nothing]
   object NilLike extends NilLike
 
   /**
-    *  This means we need to be able to fix that ADT type's point and
-    *  a means to encode the two constructor functions that allow us to
+    *  With `Fix` we now are able to fix this "list like" ADT type's point,
+    *  and means to encode the two constructor functions that allow us to
     *  construct a List in terms of a fixpoint calculation.
     */
   type List[A] =
@@ -156,9 +159,19 @@ object fixpoint extends App {
     */
   val xs = cons(1, cons(2, cons(3, nil)))
 
+  /*  => Fix[ListLike[A, ?]](NilLike)
+   *
+   *
+   */
+
 
   /**
-    *  Now onto fixpoint calculations at type level.
+    *  Now onto fixpoint calculations at type level, we turn the rather
+    *  easily defined recursive implementation of a `Fix`point data type
+    *  above into a small ADT that will allow inductive expressions at
+    *  type-level, while still encoding the `F[Y[F]]` pattern as the
+    *  encapsulated function `f`.  Mathematically we call this type level
+    *  induction.
     */
   trait Inductive
   trait INil extends Inductive
@@ -212,4 +225,10 @@ object fixpoint extends App {
     Seq(hs)
 
   println(alsoFac2(3))
+
+  /*  =>  `Int :: String :: HNil`
+   *  ==  `Int :: String :: IFix[ListLike[NilLike, ?], INil]`
+   *  ==  `Int :: IFix[ListLike[String, ?], IFix[ListLike[NilLike, ?], INil]]`
+   *  ==  `IFix[ListLike[Int, ?], IFix[ListLike[String, ?], IFix[ListLike[NilLike, ?], INil]]`
+   */
 }
