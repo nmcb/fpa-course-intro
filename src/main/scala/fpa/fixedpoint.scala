@@ -80,7 +80,6 @@ object fixpoint extends App {
     *  that the number 0.739085 is a fixpoint of the cosine function.
     */
 
-
   /**
     *  Let's derive a function that calculates a function fixpoint, e.g.:
     *
@@ -159,12 +158,6 @@ object fixpoint extends App {
     */
   val xs = cons(1, cons(2, cons(3, nil)))
 
-  /*  => Fix[ListLike[A, ?]](NilLike)
-   *
-   *
-   */
-
-
   /**
     *  Now onto fixpoint calculations at type level, we turn the rather
     *  easily defined recursive implementation of a `Fix`point data type
@@ -216,19 +209,31 @@ object fixpoint extends App {
     IFix[ListLike[A, ?], AS](ConsLike(x, xs))
 
   /**
-    *  With that we can create proper heterogeneous lists, e.g.:
+    *  With that we can create proper heterogeneous lists, e.g.
     */
-  val hs: Int :: String :: HNil =
+  val hs: Int :: String :: HNil = // <- look mama, without hands!
     hcons(1, hcons("one", hnil))
-
-  val yeah: Seq[Int :: String :: HNil] = // <- look mama, without hands!
-    Seq(hs)
-
-  println(alsoFac2(3))
 
   /*  =>  `Int :: String :: HNil`
    *  ==  `Int :: String :: IFix[ListLike[NilLike, ?], INil]`
    *  ==  `Int :: IFix[ListLike[String, ?], IFix[ListLike[NilLike, ?], INil]]`
    *  ==  `IFix[ListLike[Int, ?], IFix[ListLike[String, ?], IFix[ListLike[NilLike, ?], INil]]`
    */
+
+  /**
+    *  It's time to look back on what we've actually achieved at the end of this
+    *  session.  We've crafted a type preserving version of the Y combinator,
+    *  called `IFix` which accepts a type constructor `F` of kind `* -> *` as
+    *  its "function" and calculates the fixpoint solution of the concrete
+    *  type during type checking.  Then we defined a non-recursive ADT describing
+    *  the type-level structure of heterogeneous lists, and used the `IFix`
+    *  representation to inductively calculate the type of many possible different
+    *  expressions abiding that ADT _at_compile_time_!  The additional type alias
+    *  language feature of scala provided us then with the means to create
+    *  semantics, i.e. the `::` type returned by the `hcons` constructor, for
+    *  this new heterogeneous type-level structure which integrates naturally
+    *  with the existing scala language semantics. E.g.
+    */
+  val hellYeah: Seq[Int :: String :: HNil] =
+    Seq(hs)
 }

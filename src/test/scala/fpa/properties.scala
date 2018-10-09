@@ -2,8 +2,8 @@ package fpa
 package properties
 package test
 
-import org.scalacheck._
-
+//import org.scalacheck._
+//
 //object PropertiesSpec extends Properties("Properties") {
 //
 //  import Prop._

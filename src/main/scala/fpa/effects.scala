@@ -116,7 +116,6 @@ object io extends App {
     } yield name
   }
   object client {
-    import core._
     def name(): Future[String] =
       ???
   }

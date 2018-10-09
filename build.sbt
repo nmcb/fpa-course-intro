@@ -31,6 +31,6 @@ scalacOptions := Seq(
   "-feature",
   "-language:higherKinds",
   "-language:implicitConversions",
-  "-Ypartial-unification"
-
+  "-Ypartial-unification",
+  "-Ywarn-unused-import"
 )

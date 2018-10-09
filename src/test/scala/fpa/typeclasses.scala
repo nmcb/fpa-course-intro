@@ -2,11 +2,11 @@ package fpa
 package typeclasses
 package tests
 
-import java.util.UUID
-
-import org.scalatest._
-import library._
-
+//import java.util.UUID
+//
+//import org.scalatest._
+//import library._
+//
 //@Ignore
 //class MaskSpec extends FlatSpec with Matchers {
 //

@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter
 
 import cats.data.NonEmptyList
 
-import scala.util.Try
 import scala.util.matching.Regex
 
 object domain {
@@ -36,7 +35,7 @@ object validation {
 
   /** For which we're going to use cats' `Validated` and `ValidatedNel` */
   import cats.data.ValidatedNel
-  import cats.data.Validated.{invalid, invalidNel, valid}
+  import cats.data.Validated.invalidNel
 
   type Error = String
   val  NEL   = NonEmptyList
@@ -104,8 +103,6 @@ object validation {
     * error messages in the left side of the `ValidatedNel` if one or more of the decoding
     * applications fails.
     */
-  import cats.Apply
-
   implicit val debitRecordDecoder: Decoder[DebitRecord] =
     (str: String) => str match {
       case RecordPattern(c1, c2, c3, c4, c5, c6) =>

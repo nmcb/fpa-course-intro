@@ -2,10 +2,10 @@ package fpa
 package effects
 package test
 
-import java.io.ByteArrayInputStream
-import org.scalatest._
-import scala.util.Success
-
+//import java.io.ByteArrayInputStream
+//import org.scalatest._
+//import scala.util.Success
+//
 // class EffectsSpec extends FlatSpec with Matchers {
 //
 //   import io._
