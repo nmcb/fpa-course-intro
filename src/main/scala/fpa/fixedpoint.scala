@@ -65,8 +65,8 @@ object fixpoint extends App {
   /**
     *  We could now "conceptually" define the fixpoint of facLike as:
     */
-  val factorialUpToInfinity: Int => Int =
-    facLike(factorialUpToInfinity) // Which never terminates [see line 39]
+  val facUpToInfinity: Int => Int =
+    facLike(facUpToInfinity) // Which never terminates [see line 39]
 
   /**
     *  Interlude: A fixed point of a function is the return value of
@@ -114,7 +114,7 @@ object fixpoint extends App {
   /**
     *  So we compose the fixpoint of facLike, thus defining factorial!
     */
-  val fixFac: Int => Int =
+  val facFix: Int => Int =
     Y(facLike)
 
 
@@ -173,8 +173,10 @@ object fixpoint extends App {
   /**
     *  Remember `case class Fix[F[_]](f: F[Fix[F]])`, well in `IFix` above
     *  we took the type application `Fix[F]` out of `f`s type, into a separate
-    *  type parameter, `R`, which itself inherits from an "`Inductive`" sequence
-    *  of inner `IFix`s, that terminate in a type level `INil`.
+    *  type parameter, `R`, which itself is bound by the "`Inductive`" coproduct.
+    *  This allows for a inductive type sequence of inner `IFix`s as that inductive
+    *  type constructor is recursively defined, and an additional inductive type
+    *  constructor `INil` which we use to terminate the inductive recursion.
     */
 
   /**
