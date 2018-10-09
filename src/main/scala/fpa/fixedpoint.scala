@@ -119,12 +119,19 @@ object fixpoint extends App {
 
 
 
-  /*** Fixed Points at Type Level ***/
+  /*** Fixed Points at Type Level : Let's build a heterogeneous list [1,2] ***/
+
+  /*
+   * Heterogeneous :
+   *
+   * [1]  Diverse in character or content.
+   * [2]  Incommensurable through being of different kinds, degrees, or dimensions.
+   */
 
   import scala.language.higherKinds
 
   /**
-    *  Let's start with defining a _type_ level fixpoint for some F.
+    *  We start with defining a _type_ level fixpoint for some F.
     *  Here `F` is a type constructor of kind `* -> *` in which the
     *  type parameter represents function `F`'s input and the resulting
     *  `Fix[F[A]]` a fixpoint output "type".
