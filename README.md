@@ -27,10 +27,16 @@ The tests associated which each individual chapter are configured to be ignored.
 
 ## History
 
-2018-07-19 : Kick Off
-2018-07-26 : Type Classes
-2018-08-02 : Map and FlatMap
-2018-08-09 : Properties
-2018-08-16 : Validation
-2018-08-23 : Cats Run Through
-2018-08-30 : IO Monad
+- 2018-07-19 : Kick Off
+- 2018-07-26 : Type Classes
+- 2018-08-02 : Map and FlatMap
+- 2018-08-09 : Properties
+- 2018-08-16 : Validation
+- 2018-08-23 : Cats Run Through
+- 2018-08-30 : IO Monad
+- 2018-09-04 : Recursion - Monad Transformers
+- 2018-09-13 : List Comprehensions
+- 2018-09-20 : Q&A
+- 2018-09-28 : Monads versus the λ-calculus
+- 2018-10-04 : Canceled
+- 2018-10-11 : Y, oh Y, oh Y, oh Y?
