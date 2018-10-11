@@ -22,7 +22,7 @@ object fixpoint extends App {
   /**
     *  For the moment, assume a library factorial function exists.
     */
-  def facLib: Int => Int =
+  val facLib: Int => Int =
     ???
 
   /**
@@ -141,8 +141,8 @@ object fixpoint extends App {
   /**
     *  And try to use that implementing a generic (non-recursive) List-ADT.
     */
-  trait ListLike[+A, +T]
-  case class ConsLike[A, +T](a: A, as: T) extends ListLike[A, T]
+  trait ListLike[+H, +T]
+  case class ConsLike[H, +T](h: H, t: T) extends ListLike[H, T]
   trait NilLike extends ListLike[Nothing, Nothing]
   object NilLike extends NilLike
 
@@ -208,14 +208,14 @@ object fixpoint extends App {
   type HNil =
     IFix[ListLike[NilLike, ?], INil]
 
-  type ::[A, AS <: Inductive] =
-    IFix[ListLike[A, ?], AS]
+  type ::[A, R <: Inductive] =
+    IFix[ListLike[A, ?], R]
 
   val hnil: HNil =
     IFix[ListLike[NilLike, ?], INil](NilLike)
 
-  def hcons[A, AS <: Inductive](x: A, xs: AS): A :: AS =
-    IFix[ListLike[A, ?], AS](ConsLike(x, xs))
+  def hcons[A, R <: Inductive](x: A, xs: R): A :: R =
+    IFix[ListLike[A, ?], R](ConsLike(x, xs))
 
   /**
     *  With that we can create proper heterogeneous lists, e.g.
