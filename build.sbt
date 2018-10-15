@@ -1,7 +1,5 @@
 import Dependencies._
 
-scalaVersion := "2.12.7"
-
 lazy val mainDependencies = Seq(
   catsCore,
   catsEffect,
@@ -18,7 +16,7 @@ lazy val `fpa-course-intro` = (project in file(".")).
     name := "fpa-course-intro",
     inThisBuild(List(
       organization := "fpa",
-      scalaVersion := "2.12.6",
+      scalaVersion := "2.12.7",
       version      := "0.1.0"
     )),
     addCompilerPlugin(kindProjector),
