@@ -7,12 +7,8 @@ import cats.effect._
 object monaderror extends App {
 
   /** Functional errors */
-  sealed abstract class Deviation(msg: String) extends RuntimeException(msg)
-  case class RoomAlreadyExist() extends Deviation("200 Ok")
-  case class ServerError() extends Deviation(s"500 Server Error")
-
-  /** Technical errors */
-  case class CouldNotConnect() extends RuntimeException
+  sealed trait Deviation
+  case class RoomAlreadyExist() extends Deviation
 
   /** The monadic result stack */
   type Result[A]  = Either[Deviation, A]
@@ -30,7 +26,7 @@ object monaderror extends App {
 
   /** Some call that throws and wraps it result as: */
   val callWhichThrows: ResultT[Room] =
-    MonadError[ResultT[?], Throwable].raiseError(CouldNotConnect())
+    MonadError[ResultT[?], Throwable].raiseError(new RuntimeException("Boom!"))
 
 
   object http {
@@ -47,7 +43,7 @@ object monaderror extends App {
       (room: Room) => (code: Int) => IO(s"$code : $room")
 
     implicit def httpDeviation[E <: Deviation]: Http[E] =
-      (error: E) => (code: Int) => IO(s"$code : ${error.getMessage}")
+      (error: E) => (code: Int) => IO(s"$code : ${error.toString}")
 
     implicit def httpResult[A : Http]: Http[Result[A]] =
       (result: Result[A]) => (code: Int) => result match {
@@ -55,10 +51,12 @@ object monaderror extends App {
       case Right(value)    => value.toResponse(code)
     }
 
+    case class ServerError(msg: String) extends Deviation
+
     implicit def httpResultT[A : Http]: Http[ResultT[A]] =
       (result: ResultT[A]) => (code: Int) => {
         val recovered = MonadError[ResultT[?], Throwable].recoverWith(result) {
-          case t: Throwable => EitherT.leftT[IO, A](ServerError())
+          case t: Throwable => EitherT.leftT[IO, A](ServerError(t.getMessage))
         }
         recovered.value.flatMap(_.toResponse(code))
       }
