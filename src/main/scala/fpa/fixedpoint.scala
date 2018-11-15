@@ -2,7 +2,9 @@ package fpa
 
 object fixpoint extends App {
 
-  /*** Fixed Points at Value Level ***/
+  /*** We're going to implement a HList using fixed-points at type level ***/
+
+  /*** But first ... Fixed Points at Value Level ***/
 
   /**
     *  Let us try to factor out the recursive part of a function.
