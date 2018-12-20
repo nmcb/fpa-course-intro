@@ -1,6 +1,6 @@
 package fpa
 
-object fixpoint extends App {
+object fixpoint {
 
   /*** We're going to implement a HList using fixed-points at type level ***/
 
@@ -141,7 +141,7 @@ object fixpoint extends App {
   case class Fix[F[_]](f: F[Fix[F]])
 
   /**
-    *  And try to use that implementing a generic (non-recursive) List-ADT.
+    *  And try to use that implementing a generic (non-recursive) list like ADT.
     */
   trait ListLike[+H, +T]
   case class ConsLike[H, +T](h: H, t: T) extends ListLike[H, T]
@@ -222,7 +222,7 @@ object fixpoint extends App {
   /**
     *  With that we can create proper heterogeneous lists, e.g.
     */
-  val hs: Int :: String :: HNil = // <- look mama, without hands!
+  val hs: Int :: String :: HNil = // <- look ma, cycling without hands!
     hcons(1, hcons("one", hnil))
 
   /*  =>  `Int :: String :: HNil`
@@ -235,15 +235,16 @@ object fixpoint extends App {
     *  It's time to look back on what we've actually achieved at the end of this
     *  session.  We've crafted a type preserving version of the Y combinator,
     *  called `IFix` which accepts a type constructor `F` of kind `* -> *` as
-    *  its "function" and calculates the fixpoint solution of the concrete
-    *  type during type checking.  Then we defined a non-recursive ADT describing
-    *  the type-level structure of heterogeneous lists, and used the `IFix`
-    *  representation to inductively calculate the type of many possible different
-    *  expressions abiding that ADT _at_compile_time_!  The additional type alias
-    *  language feature of scala provided us then with the means to create
-    *  semantics, i.e. the `::` type returned by the `hcons` constructor, for
-    *  this new heterogeneous type-level structure which integrates naturally
-    *  with the existing scala language semantics. E.g.
+    *  its "function" and calculates the fixpoint solution of the concrete type of
+    *  that function during type checking.  Then we defined a non-recursive ADT
+    *  describing the type-level structure of heterogeneous lists, and used the
+    *  `IFix` representation to inductively calculate the type of many possible
+    *  different expressions abiding that ADT _at_compile_time_!
+    *
+    *  The additional type alias language feature of scala provided us then with
+    *  the means to create semantics, i.e. the `::` type returned by the `hcons`
+    *  constructor, for this new heterogeneous type-level structure which
+    *  integrates naturally with the existing scala language semantics.  E.g.:
     */
   val hellYeah: Seq[Int :: String :: HNil] =
     Seq(hs)
