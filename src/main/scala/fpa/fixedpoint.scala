@@ -85,22 +85,22 @@ object fixpoint {
   /**
     *  Let's derive a function that calculates a function fixpoint, e.g.:
     *
-    *               Let's derive the (untyped) Y-Combinator
+    *               Let's derive an (untyped) fix-combinator
     *
-    *  Y(f) == fixpoint-of-f                       --by definition (our definition)
+    *  fix(f) == fixpoint-of-f                       --by definition (our definition)
     *
-    *  f(fixpoint-of-f) == fixpoint-of-f           --by definition (the definition)
+    *  f(fixpoint-of-f) == fixpoint-of-f             --by definition (the definition)
     *
-    *  Y(f) == fixpoint-of-f == f(fixpoint-of-f)   --by equality
+    *  fix(f) == fixpoint-of-f == f(fixpoint-of-f)   --by equality
     *
-    *  Y(f) == f(Y(f))                             --by substitution
+    *  fix(f) == f(fix(f))                           --by substitution
     *
     *  Voila!
     */
 
 
   /**
-    *  Typed (fortunately) we need Y to accept a function:
+    *  Typed (fortunately) we need fix to accept a function:
     *
     *  a)  That takes a function of A to A to a function of A to A.
     *
@@ -108,16 +108,16 @@ object fixpoint {
     *
     *  Note that the input's function type is, itself, formed as the return type.
     */
-  def Y[A]: ((A => A) => (A => A)) => (A => A) =
+  def fix[A]: ((A => A) => (A => A)) => (A => A) =
     (f: (A => A) => (A => A)) =>
       (a: A) =>
-        f(Y(f))(a)
+        f(fix(f))(a)
 
   /**
     *  So we compose the fixpoint of facLike, thus defining factorial!
     */
   val facFix: Int => Int =
-    Y(facLike)
+    fix(facLike)
 
 
 
@@ -171,7 +171,7 @@ object fixpoint {
     *  Now onto fixpoint calculations at type level, we turn the rather
     *  easily defined recursive implementation of a `Fix`point data type
     *  above into a small ADT that will allow inductive expressions at
-    *  type-level, while still encoding the `F[Y[F]]` pattern as the
+    *  type-level, while still encoding the `F[Fix[F]]` pattern as the
     *  encapsulated function `f`.  Mathematically we call this type level
     *  induction.
     */
@@ -233,7 +233,7 @@ object fixpoint {
 
   /**
     *  It's time to look back on what we've actually achieved at the end of this
-    *  session.  We've crafted a type preserving version of the Y combinator,
+    *  session.  We've crafted a type preserving version of the fix combinator,
     *  called `IFix` which accepts a type constructor `F` of kind `* -> *` as
     *  its "function" and calculates the fixpoint solution of the concrete type of
     *  that function during type checking.  Then we defined a non-recursive ADT
