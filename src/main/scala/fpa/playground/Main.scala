@@ -3,12 +3,14 @@ package fpa.playground
 object Main extends App {
 
   class Printer[A](val callback: (A => Unit) => Unit) extends Thread {
+
     override def run(): Unit = {
       if (callback != null) callback(a => println(a.toString)) else ()
       Thread.sleep(100)
       run()
     }
   }
+
   object Printer {
     def apply[A](callback: (A => Unit) => Unit): Printer[A] = {
       val printer = new Printer(callback)
@@ -30,7 +32,7 @@ object Main extends App {
 //  runner()
 
   import cats.effect._
-  val prog = IO.async[Unit] { cb => {
+  val prog = IO.async[Int] { (cb: Either[Throwable, Int] => Unit) => {
     import scala.concurrent.ExecutionContext.Implicits.global
     println("started!")
     scala.concurrent.Future {
@@ -38,7 +40,7 @@ object Main extends App {
       println("finished!")
     }
     // Await.result(future, Duration.Inf)
-    cb(Right(()))
+    cb(Right(1))
   }}
   prog.unsafeRunSync()
   println("prog ended!")

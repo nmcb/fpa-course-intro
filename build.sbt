@@ -3,7 +3,8 @@ import Dependencies._
 lazy val mainDependencies = Seq(
   catsCore,
   catsEffect,
-  fastparse
+  fastparse,
+  uPickle
 )
 
 lazy val testDependencies = Seq(

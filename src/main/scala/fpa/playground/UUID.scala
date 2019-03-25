@@ -29,7 +29,8 @@ object UUID {
 
     def parseUUID(s: String): UUID = parse(s, uuid(_)) match {
       case Success(v, _) => v
-      case f: Failure    => { println(f) ; sys.error(f.msg) }
+      case f: Failure    => sys.error(f.msg)
     }
   }
+
 }

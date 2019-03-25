@@ -24,7 +24,7 @@ object fixpoint {
   /**
     *  For the moment, assume a library factorial function exists.
     */
-  val facLib: Int => Int =
+  lazy val facLib: Int => Int =
     ???
 
   /**
@@ -163,7 +163,7 @@ object fixpoint {
     Fix[ListLike[A, ?]](ConsLike(x, xs))
 
   /**
-    *  With that we are already able to build lists at value level, e.g.
+    *  With that we are already able to build lists at type level, e.g.
     */
   val xs = cons(1, cons(2, cons(3, nil)))
 

@@ -1,11 +1,17 @@
+// ING Labs - Acanthus Building C - Room Stephan Hawking
+// 13:00 - 14:00 :: Nguyen, H.V. (Viet)
+
+
 object recursion extends App {
 
-  import util._
+  def odd_[A](l: List[A]): Boolean =
+    if (l.isEmpty) false else even_(l.tail)
 
-  def odd[A](l: List[A]): Pure[Boolean]  = if (l.isEmpty) done(false) else call(even(l.tail))
-  def even[A](l: List[A]): Pure[Boolean] = if (l.isEmpty) done(true) else call(odd(l.tail))
+  def even_[A](l: List[A]): Boolean =
+    if (l.isEmpty) true else odd_(l.tail)
 
-  println(even((1 until 1000000).toList))
+  println(even_((1 until 1000000).toList))
+
 }
 
 object util {
@@ -16,10 +22,14 @@ object util {
       case Call(t) => t().compute
     }
   }
+
   case class Done[A](a: A) extends Pure[A]
   case class Call[A](t: () => Pure[A]) extends Pure[A]
 
-  def done[A](a: A): Pure[A] = Done(a)
-  def call[A](p: => Pure[A]): Pure[A] = Call(() => p)
+  def done[A](a: A): Pure[A] =
+    Done(a)
+
+  def call[A](p: => Pure[A]): Pure[A] =
+    Call(() => p)
 
 }
