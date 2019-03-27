@@ -12,7 +12,7 @@ class TemplateTest extends FlatSpec with Matchers {
 
   def interpret(template: String)(environment: Vars): Try[String] = {
 
-    @scala.annotation.tailrec def loop(cur: String, acc: String = "", keys: List[Key] = List.empty): String =
+    @scala.annotation.tailrec def loop(cur: String, acc: String = "", keys: List[Key] = Nil): String =
       keys match {
         case k :: Nil     if cur.startsWith("}")  => loop( cur.tail    , acc + value(k) , Nil                )
         case k :: p :: ks if cur.startsWith("}")  => loop( cur.tail    , acc            , p + value(k) :: ks )
