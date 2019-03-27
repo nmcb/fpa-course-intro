@@ -37,14 +37,11 @@ class TemplateTest extends FlatSpec with Matchers {
     import scala.util.Success
 
     val env = Map(
-      "c"   -> "C",
-      "g"   -> "G",
-      "bC"  -> "BC",
-      "Gh"  -> "GH",
-      "bCd" -> "BCD",
-      "fGh" -> "FGH"
+      "c"  -> "C",
+      "e"  -> "E",
+      "bC" -> "BC",
+      "Ef" -> "EF"
     )
-    interpret("A${b${c}}E${${g}h}I")(env) should be(Success("ABCEGHI"))
-    interpret("A${b${c}d}E${f${g}h}I")(env) should be(Success("ABCDEFGHI"))
+    interpret("A${b${c}}D${${e}f}G")(env) should be(Success("ABCDEFG"))
   }
 }
