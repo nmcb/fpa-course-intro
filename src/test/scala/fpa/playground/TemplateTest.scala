@@ -8,9 +8,9 @@ class TemplateTest extends FlatSpec with Matchers {
 
   type Key   = String
   type Value = String
-  type Vars  = Map[String, String]
+  type Env   = Map[String, String]
 
-  def interpret(template: String)(environment: Vars): Try[String] = {
+  def interpret(template: String)(env: Env): Try[String] = {
 
     @scala.annotation.tailrec def loop(cur: String, acc: String = "", keys: List[Key] = Nil): String =
       keys match {
@@ -24,7 +24,7 @@ class TemplateTest extends FlatSpec with Matchers {
       }
 
     def value(key: Key): Value =
-      environment.getOrElse(key, abort(s"Unresolved: $key"))
+      env.getOrElse(key, abort(s"Unresolved: $key"))
 
     def abort(msg: String): Nothing =
       throw new IllegalArgumentException(msg)
@@ -39,9 +39,12 @@ class TemplateTest extends FlatSpec with Matchers {
     val env = Map(
       "c"   -> "C",
       "g"   -> "G",
+      "bC"  -> "BC",
+      "Gh"  -> "GH",
       "bCd" -> "BCD",
       "fGh" -> "FGH"
     )
+    interpret("A${b${c}}E${${g}h}I")(env) should be(Success("ABCEGHI"))
     interpret("A${b${c}d}E${f${g}h}I")(env) should be(Success("ABCDEFGHI"))
   }
 }
