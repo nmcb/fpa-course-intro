@@ -1,16 +1,22 @@
 package fpa
 package playground
 
+import org.scalacheck.Gen
 import org.scalatest._
+
 import scala.util.Try
 
-class TemplateTest extends FlatSpec with Matchers {
+case class Template(template: String) {
 
-  type Key   = String
-  type Value = String
-  type Env   = Map[String, String]
+  import Template._
 
-  def interpret(template: String)(env: Env): Try[String] = {
+  def interpret(env: Env): Try[String] = {
+
+    def abort(msg: String): Nothing =
+      throw new IllegalArgumentException(msg)
+
+    def value(key: Key): Value =
+      env.getOrElse(key, abort(s"Unresolved: $key"))
 
     @scala.annotation.tailrec def loop(cur: String, acc: String = "", keys: List[Key] = Nil): String =
       keys match {
@@ -23,25 +29,38 @@ class TemplateTest extends FlatSpec with Matchers {
         case _                                    => abort(s"Unclosed bracket on: $${${keys.head}")
       }
 
-    def value(key: Key): Value =
-      env.getOrElse(key, abort(s"Unresolved: $key"))
-
-    def abort(msg: String): Nothing =
-      throw new IllegalArgumentException(msg)
-
     Try(loop(template))
   }
+}
 
-  "Template" should "just work" in {
+object Template {
+  type Key   = String
+  type Value = String
+  type Env   = Map[String, String]
+}
 
-    import scala.util.Success
+class TemplateTest extends FlatSpec with Matchers {
 
-    val env = Map(
-      "c"  -> "C",
-      "e"  -> "E",
-      "bC" -> "BC",
-      "Ef" -> "EF"
-    )
-    interpret("A${b${c}}D${${e}f}G")(env) should be(Success("ABCDEFG"))
+  import scala.util.Success
+
+  "Template.interpret(environment)" should "just work" in {
+
+    val environment = Map("c" -> "C", "e" -> "E", "bC" -> "BC", "Ef" -> "EF" )
+    val template    = Template("A${b${c}}D${${e}f}G")
+
+    template.interpret(environment) should be(Success("ABCDEFG"))
   }
 }
+
+object TemplateProperties extends org.scalacheck.Properties("Template") {
+
+  import org.scalacheck.Prop.forAll
+  import scala.util.Success
+  import Template._
+
+  property("∀ t: String, e: Env -> Template(t).interpret(e) : Success[String]") =
+    forAll { (template: String, environment: Env) =>
+      Template(template).interpret(environment).isInstanceOf[Success[String]]
+    }
+}
+
