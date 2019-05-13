@@ -114,6 +114,11 @@ object fixpoint {
         f(fix(f))(a)
 
   /**
+    *  In an untyped language this would just be:  def fix f = f fix f
+    */
+
+
+  /**
     *  So we compose the fixpoint of facLike, thus defining factorial!
     */
   val facFix: Int => Int =

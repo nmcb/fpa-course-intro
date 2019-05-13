@@ -58,6 +58,8 @@ object TemplateProperties extends org.scalacheck.Properties("Template") {
   import scala.util.Success
   import Template._
 
+  case class Fixture(template: String, environment: Env)
+
   property("∀ t: String, e: Env -> Template(t).interpret(e) : Success[String]") =
     forAll { (template: String, environment: Env) =>
       Template(template).interpret(environment).isInstanceOf[Success[String]]
