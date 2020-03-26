@@ -81,7 +81,7 @@ object io extends App {
   /** Q2 : Factor the sub expressions out in separate `IO` expressions */
   // def writeUsage
   // def readCelcius
-  // def writeFarenheit(f: Double)
+  // def writeFahrenheit(f: Double)
 
   /** `MonadError` provides methods to handle exceptions in a monadic side channel :
     *
