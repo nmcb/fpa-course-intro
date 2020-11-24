@@ -31,3 +31,19 @@ object IO {
   final case class Call[A](t: () => IO[A]) extends IO[A]
   final case class Cont[A, B](io: IO[A], f: A => IO[B]) extends IO[B]
 }
+
+object watch extends App {
+  import scala.util.control.TailCalls._
+  def ack(m: Int, n: Int): TailRec[Int] = (m,n) match {
+    case (0,_) => done(n + 1)
+    case (_,0) => tailcall(ack(m - 1, 1))
+    case (_,_) => tailcall(for {
+                    inner <- ack(m, n - 1)
+                    outer <- ack(m - 1, inner)
+                  } yield outer)
+  }
+
+  val m = 3
+  val n = 12
+  println(s"ack($m,$n) = ${ack(m,n).result}")
+}
