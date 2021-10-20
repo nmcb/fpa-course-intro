@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  lazy val kindProjector = "org.typelevel"  %% "kind-projector" % "0.11.0" cross CrossVersion.full
+  lazy val kindProjector = "org.typelevel"  %% "kind-projector" % "0.13.2" cross CrossVersion.full
   lazy val catsCore      = "org.typelevel"  %% "cats-core"      % "2.1.1"
   lazy val catsEffect    = "org.typelevel"  %% "cats-effect"    % "2.1.2"
 

@@ -49,13 +49,15 @@ object client extends App {
 
   // Client side domain
   case class BankNumber(str: String)
+  case class Customer(name: String, bankNumber: BankNumber)
+
   object BankNumber {
     /** Q 5: BankNumbers should be masked as `BankNumber(masked)` */
     implicit def maskBankNumber: Mask[BankNumber] =
       (_: BankNumber) => "BankNumber(masked)"
   }
 
-  case class Customer(name: String, bankNumber: BankNumber)
+
   object Customer {
     /** Q 6: Customers should mask the contained BankNumber */
     implicit def maskCustomer(implicit bankNumberMask: Mask[BankNumber]): Mask[Customer] =

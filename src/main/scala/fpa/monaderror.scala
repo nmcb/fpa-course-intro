@@ -14,19 +14,21 @@ object monaderror extends App {
   type Result[A]  = Either[Deviation, A]
   type ResultT[A] = EitherT[IO, Deviation, A]
 
+  val ResultT = EitherT
+
   case class Room(id: Long)
 
   /** Some call that succeeds and wraps it result as: */
   val callWhichSucceeds: ResultT[Room] =
-    EitherT.pure[IO, Deviation](Room(666))
+    ResultT.pure[IO, Deviation](Room(666))
 
   /** Some call that deviates and wraps it result as: */
   val callWhichDeviates: ResultT[Room] =
-    EitherT.leftT[IO, Room](RoomAlreadyExist())
+    ResultT.leftT[IO, Room](RoomAlreadyExist())
 
   /** Some call that throws and wraps it result as: */
   val callWhichThrows: ResultT[Room] =
-    MonadError[ResultT[?], Throwable].raiseError(new RuntimeException("Boom!"))
+    MonadError[ResultT[*], Throwable].raiseError(new RuntimeException("Boom!"))
 
 
   object http {
@@ -55,8 +57,8 @@ object monaderror extends App {
 
     implicit def httpResultT[A : Http]: Http[ResultT[A]] =
       (result: ResultT[A]) => (code: Int) => {
-        val recovered = MonadError[ResultT[?], Throwable].recoverWith(result) {
-          case t: Throwable => EitherT.leftT[IO, A](ServerError(t.getMessage))
+        val recovered = MonadError[ResultT[*], Throwable].recoverWith(result) {
+          case t: Throwable => ResultT.leftT[IO, A](ServerError(t.getMessage))
         }
         recovered.value.flatMap(_.toResponse(code))
       }
@@ -75,5 +77,5 @@ object monaderror extends App {
     _ <- callWhichThrows.toResponse(500).map(println)
   } yield ()
 
-  prog.unsafeRunSync
+  prog.unsafeRunSync()
 }

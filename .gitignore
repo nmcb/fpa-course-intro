@@ -25,4 +25,13 @@ project/plugins/project/
 # Ensime
 /.ensime*
 
+# Bloop
+.bloop/
+.bsp/
+.metals/
+.vscode/
+project/.bloop/
+project/project/
+project/metals.sbt
+
 .DS_Store

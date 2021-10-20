@@ -1,6 +1,4 @@
-// ING Labs - Acanthus Building C - Room Stephan Hawking
-// 13:00 - 14:00 :: Nguyen, H.V. (Viet)
-
+package fpa
 
 object recursion extends App {
 

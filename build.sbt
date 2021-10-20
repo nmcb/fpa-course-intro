@@ -17,7 +17,7 @@ lazy val `fpa-course-intro` = (project in file(".")).
     name := "fpa-course-intro",
     inThisBuild(List(
       organization := "fpa",
-      scalaVersion := "2.13.1",
+      scalaVersion := "2.13.6",
       version      := "0.1.0"
     )),
     addCompilerPlugin(kindProjector),

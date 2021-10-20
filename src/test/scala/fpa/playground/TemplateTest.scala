@@ -2,7 +2,9 @@ package fpa
 package playground
 
 import org.scalacheck.Gen
-import org.scalatest._
+
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 
 import scala.util.Try
 
@@ -39,7 +41,7 @@ object Template {
   type Env   = Map[String, String]
 }
 
-class TemplateTest extends FlatSpec with Matchers {
+class TemplateTest extends AnyFlatSpec with Matchers {
 
   import scala.util.Success
 

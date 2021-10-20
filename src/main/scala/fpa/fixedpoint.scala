@@ -159,13 +159,13 @@ object fixpoint {
     *  construct a List in terms of a fixpoint calculation.
     */
   type List[A] =
-    Fix[ListLike[A, ?]]
+    Fix[ListLike[A, *]]
 
   def nil[A]: List[A] =
-    Fix[ListLike[A, ?]](NilLike)
+    Fix[ListLike[A, *]](NilLike)
 
   def cons[A](x: A, xs: List[A]): List[A] =
-    Fix[ListLike[A, ?]](ConsLike(x, xs))
+    Fix[ListLike[A, *]](ConsLike(x, xs))
 
   /**
     *  With that we are already able to build lists at type level, e.g.
@@ -213,16 +213,16 @@ object fixpoint {
     *  constructors.
     */
   type HNil =
-    IFix[ListLike[NilLike, ?], INil]
+    IFix[ListLike[NilLike, *], INil]
 
   type ::[A, R <: Inductive] =
-    IFix[ListLike[A, ?], R]
+    IFix[ListLike[A, *], R]
 
   val hnil: HNil =
-    IFix[ListLike[NilLike, ?], INil](NilLike)
+    IFix[ListLike[NilLike, *], INil](NilLike)
 
   def hcons[A, R <: Inductive](x: A, xs: R): A :: R =
-    IFix[ListLike[A, ?], R](ConsLike(x, xs))
+    IFix[ListLike[A, *], R](ConsLike(x, xs))
 
   /**
     *  With that we can create proper heterogeneous lists, e.g.

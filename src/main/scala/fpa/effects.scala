@@ -74,7 +74,7 @@ object io extends App {
 
   val main: Unit = {
     print(s"=>> Enter a temperature in degrees °F : ")
-    val fahrenheit = StdIn.readDouble
+    val fahrenheit = StdIn.readDouble()
     println(s"=>> $fahrenheit °F === ${f2c(fahrenheit)} °C")
   }
 
