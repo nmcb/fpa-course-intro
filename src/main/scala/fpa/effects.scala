@@ -59,6 +59,8 @@ object intro extends App {
 
   /** At the end of the world ... we can execute both programs : */
 
+  import cats.effect.unsafe.implicits.global
+
   pureSideEffectingProg1.unsafeRunSync()
   pureSideEffectingProg2.unsafeRunSync()
 
