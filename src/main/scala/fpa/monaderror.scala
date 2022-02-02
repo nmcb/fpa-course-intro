@@ -77,5 +77,7 @@ object monaderror extends App {
     _ <- callWhichThrows.toResponse(500).map(println)
   } yield ()
 
+  import cats.effect.unsafe.implicits.global
+
   prog.unsafeRunSync()
 }

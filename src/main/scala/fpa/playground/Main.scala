@@ -32,16 +32,23 @@ object Main extends App {
 //  runner()
 
   import cats.effect._
-  val prog = IO.async[Int] { (cb: Either[Throwable, Int] => Unit) => {
+  import scala.concurrent._
+  import duration._
+
+  val prog = IO.async[Int] { (cb: Either[Throwable, Int] => Unit) => IO {
     import scala.concurrent.ExecutionContext.Implicits.global
     println("started!")
-    scala.concurrent.Future {
+    val future = scala.concurrent.Future {
       Thread.sleep(5000)
       println("finished!")
     }
-    // Await.result(future, Duration.Inf)
+    Await.result(future, Duration.Inf)
     cb(Right(1))
+    Some(IO.unit)
   }}
+
+  import cats.effect.unsafe.implicits.global
+
   prog.unsafeRunSync()
   println("prog ended!")
 }
