@@ -14,4 +14,3 @@ jobs:
         with:
           github-token: ${{ secrets.REPO_GITHUB_TOKEN }}
           author-email: marco@splatter.nl
-diff --git a/.github/workflows/scala-steward.yml b/.github/workflows/scala-steward.yml
