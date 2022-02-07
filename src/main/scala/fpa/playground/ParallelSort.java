@@ -43,11 +43,7 @@ public class ParallelSort {
      
     private int[] getData() {
         try {
-            BufferedImage image = ImageIO.read(
-                Objects.requireNonNull(getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("image.png"))
-            );
+            BufferedImage image = ImageIO.read(Objects.requireNonNull(ParallelSort.class.getResourceAsStream("/image.png")));
             int w = image.getWidth();
             int h = image.getHeight();
             int[] src = image.getRGB(0, 0, w, h, null, 0, w);
