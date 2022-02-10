@@ -8,6 +8,6 @@ object Dependencies {
   lazy val fastparse     = "com.lihaoyi"    %% "fastparse"      % "2.3.3"
   lazy val uPickle       = "com.lihaoyi"    %% "upickle"        % "1.5.0"
 
-  lazy val scalaTest     = "org.scalatest"  %% "scalatest"      % "3.2.10"
+  lazy val scalaTest     = "org.scalatest"  %% "scalatest"      % "3.2.11"
   lazy val scalaCheck    = "org.scalacheck" %% "scalacheck"     % "1.15.4"
 }
