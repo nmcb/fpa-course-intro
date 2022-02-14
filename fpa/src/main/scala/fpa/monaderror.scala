@@ -28,7 +28,7 @@ object monaderror extends App {
 
   /** Some call that throws and wraps it result as: */
   val callWhichThrows: ResultT[Room] =
-    MonadError[ResultT[*], Throwable].raiseError(new RuntimeException("Boom!"))
+    MonadError[ResultT, Throwable].raiseError(new RuntimeException("Boom!"))
 
 
   object http {
@@ -57,7 +57,7 @@ object monaderror extends App {
 
     implicit def httpResultT[A : Http]: Http[ResultT[A]] =
       (result: ResultT[A]) => (code: Int) => {
-        val recovered = MonadError[ResultT[*], Throwable].recoverWith(result) {
+        val recovered = MonadError[ResultT, Throwable].recoverWith(result) {
           case t: Throwable => ResultT.leftT[IO, A](ServerError(t.getMessage))
         }
         recovered.value.flatMap(_.toResponse(code))

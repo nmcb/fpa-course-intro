@@ -135,8 +135,6 @@ object fixpoint {
    * [2]  Incommensurable through being of different kinds, degrees, or dimensions.
    */
 
-  import scala.language.higherKinds
-
   /**
     *  We start with defining a _type_ level fixpoint for some F.
     *  Here `F` is a type constructor of kind `* -> *` in which the
@@ -231,9 +229,9 @@ object fixpoint {
     hcons(1, hcons("one", hnil))
 
   /*  =>  `Int :: String :: HNil`
-   *  ==  `Int :: String :: IFix[ListLike[NilLike, ?], INil]`
-   *  ==  `Int :: IFix[ListLike[String, ?], IFix[ListLike[NilLike, ?], INil]]`
-   *  ==  `IFix[ListLike[Int, ?], IFix[ListLike[String, ?], IFix[ListLike[NilLike, ?], INil]]`
+   *  ==  `Int :: String :: IFix[ListLike[NilLike, *], INil]`
+   *  ==  `Int :: IFix[ListLike[String, *], IFix[ListLike[NilLike, *], INil]]`
+   *  ==  `IFix[ListLike[Int, *], IFix[ListLike[String, *], IFix[ListLike[NilLike, *], INil]]`
    */
 
   /**

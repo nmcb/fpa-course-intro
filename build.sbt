@@ -1,10 +1,11 @@
 import Dependencies._
 
+ThisBuild / organization := "fpa"
+ThisBuild / version      := "0.1.0"
+
 lazy val mainDependencies = Seq(
   catsCore,
-  catsEffect,
-  fastparse,
-  uPickle
+  catsEffect
 )
 
 lazy val testDependencies = Seq(
@@ -12,34 +13,27 @@ lazy val testDependencies = Seq(
   scalaCheck
 ).map(_ % Test)
 
-lazy val `fpa` = (project in file("fpa")).
-  settings(
+lazy val root = (project in file("."))
+  .aggregate(fpa, fps)
+
+lazy val fpa = (project in file("fpa"))
+  .settings(
+    scalaVersion := "2.13.8",
     name := "fpa-course-intro",
-    inThisBuild(List(
-      organization := "fpa",
-      scalaVersion := "2.13.8",
-      version      := "0.1.0"
-    )),
-    addCompilerPlugin(kindProjector),
-    libraryDependencies ++= mainDependencies ++ testDependencies
+    libraryDependencies ++= mainDependencies ++ testDependencies,
+    addCompilerPlugin(kindProjector)
   )
 
-lazy val `fps` = (project in file("fps")).
+lazy val fps = (project in file("fps")).
   settings(
+    scalaVersion := "3.1.1",
     name := "fps-course",
-    inThisBuild(List(
-      organization := "fps",
-      scalaVersion := "2.13.8",
-      version      := "0.1.0"
-    )),
-    addCompilerPlugin(kindProjector),
     libraryDependencies ++= mainDependencies ++ testDependencies
   )
 
-scalacOptions := Seq(
+scalacOptions ++= Seq(
   "-unchecked",
   "-deprecation",
   "-feature",
-  "-language:higherKinds",
-  "-language:implicitConversions"
+  "-language:higherKinds"
 )
