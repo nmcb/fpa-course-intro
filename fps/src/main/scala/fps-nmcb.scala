@@ -55,3 +55,22 @@ object Test extends App:
 
   assert(fixture.find(_.age == 41) == Some(Person("Jolly Joe", 41)))
   assert(fixture.find(_.age == 40) == None)
+
+
+
+
+  def curry[A,B,C](f: (A, B) => C): A => B => C =
+    (a: A) => (b: B) => f(a,b)
+
+  val mf: (Char, String) => Int =
+    (c: Char, s: String) => s.prepended(c).toInt
+
+  assert(mf('1', "23") == 123)
+  val curriedmf = curry(mf)
+  val pamf = curry(mf)('1')
+  assert(pamf("23") == 123)
+
+  def uncurry[A,B,C](f: A => B => C): (A, B) => C =
+    (a: A, b: B) => f(a)(b)
+
+  assert(mf('1', "23") == uncurry(curriedmf)('1', "23"))
