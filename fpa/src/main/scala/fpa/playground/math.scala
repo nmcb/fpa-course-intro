@@ -31,7 +31,7 @@ object math extends App {
 
   val size   = 10000000
   val rounds = 200
-  val ns     = for (i <- 1 to size) yield Random.nextFloat
+  val ns     = for (i <- 1 to size) yield Random.nextFloat()
   val test   = for (t <- 1 to rounds) yield {
     
     val start1 = System.currentTimeMillis
@@ -47,7 +47,7 @@ object math extends App {
 
   def avg(xs: IndexedSeq[Long]): Double = {
     val (sum, length) = xs.foldLeft((0L,0L))( { case ((s,l),x)=> (x+s,1+l) })
-    sum / length
+    sum.toDouble / length.toDouble
   }
 
   val (dss,dis) = test.unzip
