@@ -160,10 +160,10 @@ object fixpoint {
     Fix[ListLike[A, *]]
 
   def nil[A]: List[A] =
-    Fix[ListLike[A, *]](NilLike)
+    new Fix[ListLike[A, *]](NilLike)
 
   def cons[A](x: A, xs: List[A]): List[A] =
-    Fix[ListLike[A, *]](ConsLike(x, xs))
+    new Fix[ListLike[A, *]](ConsLike(x, xs))
 
   /**
     *  With that we are already able to build lists at type level, e.g.
