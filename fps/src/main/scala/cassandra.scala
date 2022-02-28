@@ -189,3 +189,5 @@ object Main extends App:
   println(list2.zipWith(list3)(_+_))
   println(list2.hasSubsequence(List(2,3)))
   println(tree.fold(x=>x)((a,b)=> a.max(b)))
+
+  
