@@ -36,6 +36,28 @@ sealed trait Option[+A] {
 case class Some[+A] (get: A) extends Option[A]
 case object None extends Option[Nothing]
 
+sealed trait Either[+E, +A]{
+  def map[B](f: A => B): Either[E, B] =
+    this match
+      case Left(e) => Left(e)
+      case Right(b) => Right(f(b))
+
+  def flatMap[EE >: E, B](f: A => Either[EE, B]): Either[EE, B] =
+    this match
+      case Left(e) => Left(e)
+      case Right(a) => f(a)
+
+  def orElse[EE >: E, B >: A](b: => Either[EE, B]): Either[EE, B] =
+    this match
+      case Left(e) => b
+      case Right(a) => Right(a)
+      
+  def map2[EE >: E, B, C](b: => Either[EE, B])(f: (A, B) => C): Either[EE, C] = 
+    ???
+  
+}
+case class Left[+E](value : E) extends Either[E, Nothing]
+case class Right[+A](value : A) extends Either[Nothing, A]
 
 def failingFn(i: Int): Int = 
   val y: Int = throw new Exception("fail!")
@@ -85,10 +107,6 @@ def map2_pat[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C) : Option[C] =
 def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C) : Option[C] =
   a.flatMap(aa => b.map(bb => f(aa,bb)))    
 
-// def sequence[A] (a: List[Option[A]]) : Option[List[A]] =
-//   a match
-//     case (h,t) => 
-//     case 
 
 def sequence[A](a: List[Option[A]]): Option[List[A]] = 
   a match
@@ -96,11 +114,33 @@ def sequence[A](a: List[Option[A]]): Option[List[A]] =
     case h :: t => h.flatMap(hh => sequence(t).map(tt => hh :: tt))
 
 
+// def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
+//   a match
+//     case Nil => Some(Nil)
+//     case h :: t => h.flatMap(hh => traverse(t).map(tt => f(hh) :: tt)(f))
+
+def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = 
+   a match 
+     case Nil => Some(Nil)
+     case h :: t => map2(f(h), traverse(t)(f))(_ :: _)
+
+def sequence_tra[A](a: List[Option[A]]): Option[List[A]] = 
+  traverse(a)(x => x)     
+
+
+def tryint(a: String): Option[Int] =
+  try Some(a.toInt)
+  catch { case e: Exception => None}  
+
+
+
+
 object Main2 extends App:
   // println(failingFn(12))
   // println(failingFn2(12))
 
   val testSome = List(1,2,3)
+  val testString = List("1", "2", "3")
   val testLoneSome = Some(666)
   val testLoneNone : Option[Nothing] = None
 
@@ -108,9 +148,15 @@ object Main2 extends App:
 
   val testSomeMap = Map(1 -> "Boo", 2 -> "BooBoo") // doesnt work with our implementation, but helps me understand
 
-  println(testLoneSome.map(x => Some(x + 1)))
+  val testRight: Either[String, Int] = Right(20)
+  val testLeft: Either[String, Int] = Left("error")
+  // println(testLoneSome.map(x => Some(x + 1)))
   
-  println(sequence(testListSome))
+  // println(sequence(testListSome))
+  println(traverse(testString)(tryint))
+  println(sequence_tra(testListSome))
+  println(testRight.map(_ + 20))
+  println(testLeft.map(_ + "string"))
   // println(testSome.map(a => a + 1)) // apply function to each element in list
   // println(testLoneSome.getOrElse(0)) // on some(666) so it gets the value
   // println(testLoneNone.getOrElse(0)) // this works on none, so it returns the default value
