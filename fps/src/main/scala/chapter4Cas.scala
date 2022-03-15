@@ -51,11 +51,15 @@ sealed trait Either[+E, +A]{
     this match
       case Left(e) => b
       case Right(a) => Right(a)
-      
+
   def map2[EE >: E, B, C](b: => Either[EE, B])(f: (A, B) => C): Either[EE, C] = 
-    ???
-  
+    for {
+      a <- this // the a is an either
+      bb <- b // the b is the b that is explicitly added, lazy evaluation (I think)
+    } yield f(a, bb) // here is the function, which combines an a and a b and returns a c (still an either)
+
 }
+
 case class Left[+E](value : E) extends Either[E, Nothing]
 case class Right[+A](value : A) extends Either[Nothing, A]
 
@@ -113,12 +117,6 @@ def sequence[A](a: List[Option[A]]): Option[List[A]] =
     case Nil => Some(Nil)
     case h :: t => h.flatMap(hh => sequence(t).map(tt => hh :: tt))
 
-
-// def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
-//   a match
-//     case Nil => Some(Nil)
-//     case h :: t => h.flatMap(hh => traverse(t).map(tt => f(hh) :: tt)(f))
-
 def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = 
    a match 
      case Nil => Some(Nil)
@@ -127,13 +125,20 @@ def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
 def sequence_tra[A](a: List[Option[A]]): Option[List[A]] = 
   traverse(a)(x => x)     
 
+def traverse2[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] =
+  as match
+    case Nil => Right(Nil)
+    case h :: t => (f(h).map2(traverse2(t)(f)))(_ :: _)
+
+def sequence2[E, A](es: List[Either[E, A]]): Either[E, List[A]] =
+  traverse2(es)(x => x)
 
 def tryint(a: String): Option[Int] =
   try Some(a.toInt)
   catch { case e: Exception => None}  
 
-
-
+def tryInt(a: String): Right[Int] =
+  Right(a.toInt)
 
 object Main2 extends App:
   // println(failingFn(12))
@@ -154,9 +159,10 @@ object Main2 extends App:
   
   // println(sequence(testListSome))
   println(traverse(testString)(tryint))
+  println(traverse2(testString)(tryInt))
   println(sequence_tra(testListSome))
-  println(testRight.map(_ + 20))
-  println(testLeft.map(_ + "string"))
+  // println(testRight.map(_ + 20))
+  // println(testLeft.map(_ + "string"))
   // println(testSome.map(a => a + 1)) // apply function to each element in list
   // println(testLoneSome.getOrElse(0)) // on some(666) so it gets the value
   // println(testLoneNone.getOrElse(0)) // this works on none, so it returns the default value
