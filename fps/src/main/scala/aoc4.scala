@@ -1,18 +1,11 @@
 package aoc
 import scala.io.Source
 
-// 81, 3, 12, 80, 52, 12, 97 
-// Bingo bij laatste getal
+object AOC4 extends App:
 
-object AOC extends App:
-
-    val sheet1: List[Either[String, Int]] = List(Right(1), Right(2), Right(3), Left("Marked"))
-
-    // val sheet: List[Either[String, Int]] = Source.fromFile("resources.txt").getLines
-    
     val draws: List[Int] =
       Source
-        .fromFile("fps/src/main/resources/resources.txt")
+        .fromFile("fps/src/main/resources/input04.txt")
         .getLines
         .toList
         .head
@@ -46,7 +39,7 @@ object AOC extends App:
 
     def boards =
         Source
-        .fromFile("fps/src/main/resources/resources.txt")
+        .fromFile("fps/src/main/resources/input04.txt")
         .getLines
         .drop(2)
         .toList
