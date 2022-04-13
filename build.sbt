@@ -31,7 +31,7 @@ lazy val fpa: Project =
 lazy val fps: Project =
   (project in file("fps"))
     .settings(
-      scalaVersion := "3.1.1",
+      scalaVersion := "3.1.2",
       name := "fps-course",
       libraryDependencies ++= cats ++ test
     )
