@@ -24,6 +24,7 @@ lazy val fpa: Project =
     .settings(
       scalaVersion := "2.13.8",
       name := "fpa-course-intro",
+      run / javaOptions += "-Xss1m",
       libraryDependencies ++= cats ++ test,
       addCompilerPlugin(kindProjector)
     )
