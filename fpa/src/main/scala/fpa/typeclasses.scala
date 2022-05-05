@@ -10,12 +10,13 @@ object library {
 
   /** Q 1: implement a client side explicit implicit parameter syntax */
   def loggingMethodUsingMaskExplicitly[A](a: A)(implicit mask: Mask[A]): String =
-    mask.disclose(a)
+    ???
 
   /** Q 2: Implement a client side implicit implicit parameter syntax */
   def loggingMethodUsingMaskImplicitly[A : Mask](a: A): String =
-    implicitly[Mask[A]].disclose(a)
+    ???
 
+  /** Example client-client-side usages of given functions above */
   def serviceMethodUsingLoggingMethodUsingMaskNothingMask[A](a: A): String =
     loggingMethodUsingMaskExplicitly(a)(Mask.maskNothing)
 
@@ -26,6 +27,7 @@ object library {
   /** Type class companion objects contain default Mask instances */
   object Mask {
 
+    /** A mask that masks nothing */
     def maskNothing[A]: Mask[A] =
       (a: A) => a.toString
 
@@ -35,10 +37,10 @@ object library {
 
   }
 
-  /** Q 4: We should have a nice syntax */
+  /** Q 4: We should have a nice syntax - implement it */
   implicit class MaskOps[A : Mask](a: A) {
     def disclose: String =
-      implicitly[Mask[A]].disclose(a)
+      ???
   }
 }
 
@@ -54,13 +56,12 @@ object client extends App {
   object BankNumber {
     /** Q 5: BankNumbers should be masked as `BankNumber(masked)` */
     implicit def maskBankNumber: Mask[BankNumber] =
-      (_: BankNumber) => "BankNumber(masked)"
+      ???
   }
-
 
   object Customer {
     /** Q 6: Customers should mask the contained BankNumber */
     implicit def maskCustomer(implicit bankNumberMask: Mask[BankNumber]): Mask[Customer] =
-      (c: Customer) => c.name + bankNumberMask.disclose(c.bankNumber)
+      ???
   }
 }
