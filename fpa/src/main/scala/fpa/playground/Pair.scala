@@ -11,7 +11,7 @@ case class AllInOnePair[T0,T1](t0: T0, t1: T1)(implicit ordT0: Ordering[T0], ord
       case (-1,  _) => false // left biased
       case ( 0, -1) => false
       case ( 0,  0) => false
-      case ( 1,  1) => true
+      case ( _,  1) => true
     }
   }
 
@@ -39,21 +39,20 @@ object AllInOnePair extends App {
 case class JustTheDataPair[T0,T1](t0: T0, t1: T1)
 
 object JustTheDataPair extends App {
-  implicit def ordPair[T0 : Ordering,T1 : Ordering]: Ordering[JustTheDataPair[T0,T1]] =
-    new Ordering[JustTheDataPair[T0,T1]] {
-      val ordT0 = implicitly[Ordering[T0]]
-      val ordT1 = implicitly[Ordering[T1]]
-      override def compare(p0: JustTheDataPair[T0, T1], p1: JustTheDataPair[T0, T1]): Int = {
-        val ot0 = ordT0.compare(p0.t0, p1.t0)
-        val ot1 = ordT1.compare(p1.t1, p1.t1)
-        (ot0, ot1) match {
-          case (-1,  _) => -1 // left biased
-          case ( 0, -1) => -1
-          case ( 0,  0) =>  0
-          case ( 1,  1) =>  1
-        }
+  implicit def ordPair[T0 : Ordering,T1 : Ordering]: Ordering[JustTheDataPair[T0,T1]] = {
+    val ordT0 = implicitly[Ordering[T0]]
+    val ordT1 = implicitly[Ordering[T1]]
+    (p0: JustTheDataPair[T0, T1], p1: JustTheDataPair[T0, T1]) => {
+      val ot0 = implicitly[Ordering[T0]].compare(p0.t0, p1.t0)
+      val ot1 = implicitly[Ordering[T1]].compare(p1.t1, p1.t1)
+      (ot0, ot1) match {
+        case (-1,  _) => -1 // left biased
+        case ( 0, -1) => -1
+        case ( 0,  0) =>  0
+        case ( _,  1) =>  1
       }
     }
+  }
 
   implicit class AllInOnePairOps[T0,T1](self: AllInOnePair[T0,T1])(implicit ord: Ordering[AllInOnePair[T0,T1]]) {
     def `===`(that: AllInOnePair[T0,T1]): Boolean =
