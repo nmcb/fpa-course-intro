@@ -17,7 +17,7 @@ object Optional:
     new Functorial[Optional]:
       def map[A,B](f: A => B)(oi: Optional[A]): Optional[B] =
         oi match
-          case Non   => Non
+          case Non    => Non
           case The(a) => The(f(a))
 
   implicit class OptionalOps[A](oa: Optional[A])(implicit F : Functorial[Optional]):
@@ -40,7 +40,7 @@ object Multiple:
     new Functorial[Multiple]:
       def map[A,B](f: A => B)(oi: Multiple[A]): Multiple[B] =
         oi match
-          case Empty   => Empty
+          case Empty      => Empty
           case Cell(a, r) => Cell(f(a), map(f)(r))
 
   implicit class MultipleOps[A](ma: Multiple[A])(implicit F : Functorial[Multiple]):
