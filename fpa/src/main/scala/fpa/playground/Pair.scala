@@ -45,14 +45,7 @@ object JustTheDataPair extends App {
     (p0: JustTheDataPair[T0, T1], p1: JustTheDataPair[T0, T1]) => {
       val ot0 = implicitly[Ordering[T0]].compare(p0.t0, p1.t0)
       val ot1 = implicitly[Ordering[T1]].compare(p1.t1, p1.t1)
-      (ot0, ot1) match {
-        // left-, ie. `Pair.t0` biased
-        case ( 1,  _) =>  1
-        case (-1,  _) => -1
-        case ( 0,  1) =>  1
-        case ( 0,  0) =>  0
-        case ( 0, -1) => -1
-      }
+      if (ot0 != 0) ot0 else ot1
     }
 
   implicit class JustTheDataPairOps[T0,T1](self: JustTheDataPair[T0,T1])(implicit ord: Ordering[JustTheDataPair[T0,T1]]) {
@@ -88,8 +81,8 @@ object JustTheDataPair extends App {
 
   import scala.language.implicitConversions
 
-  implicit def ordPairOps(lhs: JustTheDataPair[Int, String]) =
-    ordPair[Int,String].mkOrderingOps(lhs)
+  implicit def mkOrderingPairOps[T0,T1](lhs: JustTheDataPair[T0,T1])(implicit ord: Ordering[JustTheDataPair[T0,T1]]) =
+    ord.mkOrderingOps(lhs)
 
 //  println(p0 equiv p1)
   println(p1 equiv p2)
