@@ -148,7 +148,7 @@ object fixpoint {
     */
   trait ListLike[+H, +T]
   case class ConsLike[H, +T](h: H, t: T) extends ListLike[H, T]
-  trait NilLike extends ListLike[Nothing, Nothing]
+  trait  NilLike extends ListLike[Nothing, Nothing]
   object NilLike extends NilLike
 
   /**
@@ -163,7 +163,7 @@ object fixpoint {
     new Fix[ListLike[A, _]](NilLike)
 
   def cons[A](x: A, xs: List[A]): List[A] =
-    new Fix[ListLike[A, *]](ConsLike(x, xs))
+    new Fix[ListLike[A, _]](ConsLike(x, xs))
 
   /**
     *  With that we are already able to build lists at type level, e.g.
@@ -211,16 +211,16 @@ object fixpoint {
     *  constructors.
     */
   type HNil =
-    IFix[ListLike[NilLike, *], INil]
+    IFix[ListLike[NilLike, _], INil]
 
   type ::[A, R <: Inductive] =
-    IFix[ListLike[A, *], R]
+    IFix[ListLike[A, _], R]
 
   val hnil: HNil =
-    IFix[ListLike[NilLike, *], INil](NilLike)
+    IFix[ListLike[NilLike, _], INil](NilLike)
 
   def hcons[A, R <: Inductive](x: A, xs: R): A :: R =
-    IFix[ListLike[A, *], R](ConsLike(x, xs))
+    IFix[ListLike[A, _], R](ConsLike(x, xs))
 
   /**
     *  With that we can create proper heterogeneous lists, e.g.

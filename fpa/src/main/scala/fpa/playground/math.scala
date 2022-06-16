@@ -8,8 +8,8 @@ object MainFastInverseSquare extends App {
 
   // fast inverse sqrt implementation - https://youtu.be/p8u_k2LIZyo
 
-  import java.lang.Float.floatToIntBits
-  import java.lang.Float.intBitsToFloat
+  import _root_.java.lang.Float.floatToIntBits
+  import _root_.java.lang.Float.intBitsToFloat
 
   val threehalfs: Float = 1.5f
   val half: Float       = 0.5f
