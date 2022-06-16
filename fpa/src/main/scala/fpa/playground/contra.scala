@@ -1,4 +1,7 @@
-object demo {
+package fpa
+package playground
+
+object contra {
 
   sealed trait Opt[+A] {
 

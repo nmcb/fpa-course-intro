@@ -1,9 +1,10 @@
 package fpa
 package playground
+package math
 
 import scala.util.Random
 
-object FastInverseSquare extends App {
+object MainFastInverseSquare extends App {
 
   // fast inverse sqrt implementation - https://youtu.be/p8u_k2LIZyo
 

@@ -22,11 +22,11 @@ lazy val root: Project =
 lazy val fpa: Project =
   (project in file("fpa"))
     .settings(
-      scalaVersion         := "2.13.8",
+      scalaVersion         := "3.1.2",
       name                 := "fpa-course-intro",
-      run / javaOptions    += "-Xss1m",
       libraryDependencies ++= cats ++ test,
-      addCompilerPlugin(kindProjector)
+      scalacOptions       ++= Seq("-Ykind-projector:underscores"),
+      run / javaOptions    += "-Xss1m"
     )
 
 lazy val fps: Project =

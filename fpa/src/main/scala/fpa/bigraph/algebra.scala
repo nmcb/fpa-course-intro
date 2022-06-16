@@ -1,6 +1,7 @@
-package fpa.bigraph
+package fpa
+package bigraph
 
-object algebra extends App {
+object Main extends App {
 
   // dependencies
 

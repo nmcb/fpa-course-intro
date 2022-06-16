@@ -1,10 +1,11 @@
 package fpa
+package monaderror
 
 import cats._
 import cats.data._
 import cats.effect._
 
-object monaderror extends App {
+object Main extends App {
 
   /** Functional errors */
   sealed trait Deviation

@@ -1,6 +1,7 @@
 package fpa
+package recursion
 
-object recursion extends App {
+object Main extends App {
 
   def odd_[A](l: List[A]): Boolean =
     if (l.isEmpty) false else even_(l.tail)

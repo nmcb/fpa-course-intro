@@ -25,7 +25,7 @@ case class AllInOnePair[T0,T1](t0: T0, t1: T1)(implicit ordT0: Ordering[T0], ord
      this.`===`(that)  && !this.`__>`(that)
 }
 
-object AllInOnePair extends App {
+object MainAllInOnePair extends App {
   val p1 = AllInOnePair(1, "one")
   val p2 = AllInOnePair(2, "two")
   val p0 = AllInOnePair(0,  1.0 )
@@ -40,7 +40,7 @@ object AllInOnePair extends App {
 
 case class JustTheDataPair[T0,T1](t0: T0, t1: T1)
 
-object JustTheDataPair extends App {
+object MainJustTheDataPair extends App {
   implicit def ordPair[T0 : Ordering,T1 : Ordering]: Ordering[JustTheDataPair[T0,T1]] =
     (p0: JustTheDataPair[T0, T1], p1: JustTheDataPair[T0, T1]) => {
       val ot0 = implicitly[Ordering[T0]].compare(p0.t0, p1.t0)
@@ -81,7 +81,7 @@ object JustTheDataPair extends App {
 
   import scala.language.implicitConversions
 
-  implicit def mkOrderingPairOps[T0,T1](lhs: JustTheDataPair[T0,T1])(implicit ord: Ordering[JustTheDataPair[T0,T1]]) =
+  implicit def mkOrderingPairOps[T0,T1](lhs: JustTheDataPair[T0,T1])(implicit ord: Ordering[JustTheDataPair[T0,T1]]): ord.OrderingOps =
     ord.mkOrderingOps(lhs)
 
 //  println(p0 equiv p1)

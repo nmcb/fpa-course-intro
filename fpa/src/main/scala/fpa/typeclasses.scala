@@ -45,7 +45,7 @@ object library {
 }
 
 /** Client side code */
-object client extends App {
+object Main extends App {
 
   import library._
 

@@ -1,4 +1,5 @@
 package fpa
+package demo
 
 object lib {
   def A(m: Int, n: Int): Pure[Int] =
@@ -26,9 +27,9 @@ object lib {
 
     def flatMap[B](f: A => Pure[B]): Pure[B] =
       this match {
-        case Done(a)        => Call(() => f(a))
-        case p @ Call(_)    => Cont(p, f)
-        case c : Cont[a1,_] => Cont(c.pa, (a: a1) => c.f(a).flatMap(f))
+        case Done(a)         => Call(() => f(a))
+        case p : Call[A]     => Cont(p, f)
+        case c : Cont[a1,b1] => Cont(c.pa, (a: a1) => c.f(a).flatMap(f))
       }
 
     def map[B](f: A => B): Pure[B] =
@@ -42,9 +43,9 @@ object lib {
   def call[A](pa: => Pure[A]): Pure[A] = Call(() => pa)
 }
 
-object client extends App {
+object Main extends App {
 
   import lib._
 
-  println(s"A(3,3) = ${A(4,1).compute}")
+  println(s"A(4,1) = ${A(4,1).compute}")
 }

@@ -157,10 +157,10 @@ object fixpoint {
     *  construct a List in terms of a fixpoint calculation.
     */
   type List[A] =
-    Fix[ListLike[A, *]]
+    Fix[ListLike[A, _]]
 
   def nil[A]: List[A] =
-    new Fix[ListLike[A, *]](NilLike)
+    new Fix[ListLike[A, _]](NilLike)
 
   def cons[A](x: A, xs: List[A]): List[A] =
     new Fix[ListLike[A, *]](ConsLike(x, xs))

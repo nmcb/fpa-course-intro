@@ -1,3 +1,6 @@
+package fpa
+package playground
+
 object prolog {
 
   type UpperCase = String
@@ -18,7 +21,7 @@ object prolog {
 
   implicit def taggableList[A : Taggable]: Taggable[List[A]] = new Taggable[List[A]] {
     override def tag(t: Tag)(as: List[A]): List[A] =
-      as.map(implicitly.tag(t))
+      as.map(implicitly[Taggable[A]].tag(t))
   }
 
   implicit def taggableTerm(implicit T: Taggable[List[Term]]): Taggable[Term] = new Taggable[Term] {
@@ -51,7 +54,7 @@ object prolog {
 
   implicit def substList[A : Subst]: Subst[List[A]] = new Subst[List[A]] {
     override def subst(env: Env)(as: List[A]): List[A] =
-      as.map(implicitly subst env)
+      as.map(implicitly[Subst[A]].subst(env))
   }
 
   implicit def substTerm(implicit L: Subst[List[Term]]): Subst[Term] = new Subst[Term] {
