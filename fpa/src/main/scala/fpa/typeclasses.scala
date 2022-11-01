@@ -31,9 +31,9 @@ object library {
     def maskNothing[A]: Mask[A] =
       (a: A) => a.toString
 
-    /** Q 3: The default should not mask at all */
+    /** Q 3: The default should not disclose anything at all */
     implicit def defaultToNoMask[A]: Mask[A] =
-      (a: A) => ""
+      (a: A) => maskNothing.disclose(a)
 
   }
 
@@ -47,7 +47,7 @@ object library {
 /** Client side code */
 object Main extends App {
 
-  import library._
+  import library.*
 
   // Client side domain
   case class BankNumber(str: String)
