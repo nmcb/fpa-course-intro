@@ -9,7 +9,7 @@ object library {
   }
 
   /** Q 1: implement a client side explicit implicit parameter syntax */
-  def loggingMethodUsingMaskExplicitly[A](a: A)(implicit mask: Mask[A]): String =
+  def loggingMethodUsingMaskExplicitly[A](a: A)(using mask: Mask[A]): String =
     ???
 
   /** Q 2: Implement a client side implicit implicit parameter syntax */
@@ -17,25 +17,24 @@ object library {
     ???
 
   /** Example client-client-side usages of given functions above */
-  def serviceMethodUsingLoggingMethodUsingMaskNothingMask[A](a: A): String =
-    loggingMethodUsingMaskExplicitly(a)(Mask.maskNothing)
+//  def serviceMethodUsingLoggingMethodUsingMaskNothingMask[A](a: A): String =
+//    loggingMethodUsingMaskExplicitly(a)(Mask.maskNothing)
 
   def serviceMethodUsingLoggingMethodUsingImplicitlyProvidedMask[A : Mask](a: A): String =
     loggingMethodUsingMaskExplicitly(a)
 
 
   /** Type class companion objects contain default Mask instances */
-  object Mask {
+  object Mask:
 
     /** A mask that masks nothing */
     def maskNothing[A]: Mask[A] =
       (a: A) => a.toString
 
     /** Q 3: The default should not disclose anything at all */
-    implicit def defaultToNoMask[A]: Mask[A] =
+    given defaultToNoMask[A]: Mask[A] =
       (a: A) => maskNothing.disclose(a)
 
-  }
 
   /** Q 4: We should have a nice syntax - implement it */
   implicit class MaskOps[A : Mask](a: A) {
@@ -52,16 +51,21 @@ object Main extends App {
   // Client side domain
   case class BankNumber(str: String)
   case class Customer(name: String, bankNumber: BankNumber)
+  case class Laptop(frequency: Long)
 
-  object BankNumber {
+  object Laptop:
+    given Mask[Laptop] = Mask.maskNothing
+
+  val laptop = Laptop(1000)
+  serviceMethodUsingLoggingMethodUsingImplicitlyProvidedMask(laptop)
+
+  object BankNumber:
     /** Q 5: BankNumbers should be masked as `BankNumber(masked)` */
-    implicit def maskBankNumber: Mask[BankNumber] =
-      ???
-  }
+    given Mask[BankNumber] = (_: BankNumber) => "BankNumber(masked)"
 
   object Customer {
     /** Q 6: Customers should mask the contained BankNumber */
-    implicit def maskCustomer(implicit bankNumberMask: Mask[BankNumber]): Mask[Customer] =
-      ???
+    given maskCustomer(using bankNumberMask: Mask[BankNumber]): Mask[Customer] =
+      (c: Customer) => s"Customer(${c.name}, ${bankNumberMask.disclose(c.bankNumber)})"
   }
 }
