@@ -1,3 +1,6 @@
+--{-# LANGUAGE DataKinds #-}
+{-# language PatternSynonyms        #-}
+
 import Data.Char
 
 
@@ -72,5 +75,35 @@ instance (Functor l, Functor r) => Functor (P l r) where
 
 -- and our reconstructed option is functorial without further ado
 
-main :: IO ()
-main = print (fmap isDigit (some '1'))
+main1 :: IO ()
+main1 = print (fmap isDigit (some '1'))
+
+
+-- the expr branching structure is readily described by a polynomial
+type ExprP = S (K Int) (P I I)
+
+pattern ValP i     = L (K i)
+pattern AddP e1 e2 = R (P (I e1) (I e2))
+
+
+-- we would like now to establish the isomorphism: Expr ∼= ExprP Expr
+-- which we do via a type level fix point to tie the knot inductively
+data Mu p = In (p (Mu p))
+
+type Expr2 = Mu ExprP
+
+pattern ValM i     = In (ValP i)
+pattern AddM e1 e2 = In (AddP e1 e2)
+
+
+-- this lets us define a fold like recursion operator as a catamorphism
+cata :: Functor p => (p v -> v) -> Mu p -> v
+cata phi (In p) = phi (fmap (cata phi) p)
+
+
+-- with a subsequent evaluator for in terms of that catamorphism
+eval3 :: Expr2 -> Int
+eval3 =
+  cata phi where
+    phi (ValP v)   = v
+    phi (AddP m n) = m + n

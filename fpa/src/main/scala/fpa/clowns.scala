@@ -44,9 +44,9 @@ case class I[A](a: A)                                 // identity
 enum S[L[_], R[_], A]:                                // sum type aka either
   case L[L[_], R[_], A](la: L[A]) extends S[L, R, A]
   case R[L[_], R[_], B](ra: R[B]) extends S[L, R, B]
-case class P[L[_], R[_], A](la: L[A], ra: R[A])    // product type aka tuple
-
 import S.*
+case class P[L[_], R[_], A](la: L[A], ra: R[A])       // product type aka tuple
+
 
 
 /** eg. unit generically defined as a constant */
@@ -58,43 +58,105 @@ type One[A] = K[Unit,A]
 
 type Maybe[A] = S[One,I,A]
 
-def nothing: Maybe[Unit] =
+def nothing[A]: Maybe[A] =
   L(K(()))
 
 def just[A](a: A): Maybe[A] =
   R(I(a))
 
 
+/** the kit is functorial */
+
 trait Functor[F[_]]:
-  def fmap[A,B](fa: F[A])(f: A => B): F[B]
+  def fmap[A,B](f: A => B)(fa: F[A]): F[B]
 
 implicit def kFunctor[X]: Functor[K[X, *]] =
   new Functor[K[X, *]]:
-    def fmap[A, B](fa: K[X, A])(f: A => B): K[X, B] = K(fa.a)
+    def fmap[A, B](f: A => B)(fa: K[X, A]): K[X, B] = K(fa.a)
 
 implicit def iFunctor: Functor[I[_]] =
   new Functor[I[_]]:
-    def fmap[A, B](fa: I[A])(f: A => B): I[B] = I(f(fa.a))
+    def fmap[A, B](f: A => B)(fa: I[A]): I[B] = I(f(fa.a))
 
 implicit def sFunctor[L[_], R[_]](implicit lFunctor: Functor[L], rFunctor: Functor[R]): Functor[S[L, R, _]] =
   new Functor[S[L, R, _]]:
-    def fmap[A, B](fa: S[L, R, A])(f: A => B): S[L, R, B] =
+    def fmap[A, B](f: A => B)(fa: S[L, R, A]): S[L, R, B] =
       fa match
-        case L(la) => L(lFunctor.fmap(la)(f))
-        case R(ra) => R(rFunctor.fmap(ra)(f))
+        case L(la) => L(lFunctor.fmap(f)(la))
+        case R(ra) => R(rFunctor.fmap(f)(ra))
 
 implicit def pFunctor[L[_], R[_]](implicit lFunctor: Functor[L], rFunctor: Functor[R]): Functor[P[L, R, _]] =
   new Functor[P[L, R, _]]:
-    def fmap[A, B](fa: P[L, R, A])(f: A => B): P[L, R, B] =
-      P(lFunctor.fmap(fa.la)(f), rFunctor.fmap(fa.ra)(f))
+    def fmap[A, B](f: A => B)(fa: P[L, R, A]): P[L, R, B] =
+      P(lFunctor.fmap(f)(fa.la), rFunctor.fmap(f)(fa.ra))
 
+
+/** the expr branching structure is readily described by a polynomial */
+type ExprP[A] = S[K[Int, *], P[I, I, *], A]
+
+def valP[A](i: Int): ExprP[A] =
+  L(K(i))
+
+object ValP:
+  def unapply(ep: ExprP[Int]): Option[Int] =
+    ep match
+      case L(K(i)) => Some(i)
+      case _       => None
+
+def addP[A](e1: A, e2: A): ExprP[A] =
+  R(P(I(e1), I(e2)))
+
+object AddP:
+  def unapply(ep: ExprP[Int]): Option[(Int, Int)] =
+    ep match
+      case R(P(I(e1), I(e2))) => Some(e1, e2)
+      case _                  => None
+
+
+/** we would like now to establish the isomorphism: Expr ∼= ExprP Expr */
+/** which we do via a type level fix point to tie the knot inductively */
+case class Mu[F[_]](in: F[Mu[F]])
+
+type Expr2 = Mu[ExprP]
+
+def valM(i: Int): Expr2 =
+  Mu(valP(i))
+
+def addM[A](e1: Expr2, e2: Expr2): Expr2 =
+  Mu(addP(e1, e2))
+
+
+/** this lets us define a fold like recursion operator as a catamorphism */
+def cata[P[_], A](phi: P[A] => A)(p: Mu[P])(implicit pFunctor: Functor[P]): A =
+  phi(pFunctor.fmap(cata(phi))(p.in))
+
+/** with a subsequent evaluator in terms of that catamorphism */
+def  eval3(e: Expr2): Int =
+  def phi(e: ExprP[Int]): Int =
+    e match
+      case ValP(i)      => i
+      case AddP(e1, e2) => e1 + e2
+      case _            => sys.error("boom")
+  cata(phi)(e)
 
 object MainClown extends App:
 
   val e = Add(Add(Val(1), Val(2)), Val(3))
 
-  println(eval1(e))
-  println(eval2(e))
-  
-  println(implicitly[Functor[Maybe]].fmap(just('1'))(_.isDigit))
+  val a1 = eval1(e)
+  val a2 = eval2(e)
+  println(s"eval1(e)=$a1")
+  println(s"eval2(e)=$a2")
+  assert(a1 == 6)
+  assert(a2 == 6)
 
+  val m1 = implicitly[Functor[Maybe]].fmap[Char,Boolean](_.isDigit)(just('1'))
+  val m2 = implicitly[Functor[Maybe]].fmap[Char,Boolean](_.isDigit)(nothing[Char])
+  println(s"implicitly[Functor[Maybe]].fmap[Char,Boolean](_.isDigit)(just('1'))=$m1")
+  println(s"implicitly[Functor[Maybe]].fmap[Char,Boolean](_.isDigit)(nothing[Char])=$m2")
+  assert(m1 == R(I(true)))
+  assert(m2 == L(K(())))
+
+  println(valM(3))
+  println(addM(valM(1), valM(2)))
+  println(eval3(addM(valM(1), valM(2))))
