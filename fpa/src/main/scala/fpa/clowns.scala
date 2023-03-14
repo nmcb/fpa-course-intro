@@ -139,7 +139,7 @@ def  eval3(e: Expr2): Int =
       case _            => sys.error("boom")
   cata(phi)(e)
 
-object MainClown extends App:
+object Main extends App:
 
   val e = Add(Add(Val(1), Val(2)), Val(3))
 
@@ -157,6 +157,7 @@ object MainClown extends App:
   assert(m1 == R(I(true)))
   assert(m2 == L(K(())))
 
-  println(valM(3))
-  println(addM(valM(1), valM(2)))
-  println(eval3(addM(valM(1), valM(2))))
+  val e3 = addM(addM(valM(1), valM(2)), valM(3))
+  val a3 = eval3(e3)
+  println(s"eval3($e3)=$a3")
+  assert(a2 == 6)

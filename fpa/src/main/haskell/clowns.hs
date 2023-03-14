@@ -1,5 +1,5 @@
---{-# LANGUAGE DataKinds #-}
 {-# language PatternSynonyms        #-}
+
 
 import Data.Char
 
