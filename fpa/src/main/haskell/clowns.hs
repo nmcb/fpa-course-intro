@@ -96,7 +96,7 @@ pattern ValM i     = In (ValP i)
 pattern AddM e1 e2 = In (AddP e1 e2)
 
 
--- this lets us define a fold like recursion operator as a catamorphism
+-- this lets us define a fold like recursion operator as a catamorphism - see doc/img/cata.png
 cata :: Functor p => (p v -> v) -> Mu p -> v
 cata phi (In p) = phi (fmap (cata phi) p)
 
@@ -107,3 +107,42 @@ eval3 =
   cata phi where
     phi (ValP v)   = v
     phi (AddP m n) = m + n
+
+
+-- we shall see how to turn a cata into a first- order tail-recursion whenever p is polynomial
+-- we shall do this by dissecting p, with ‘clown’ elements left and ‘joker’s on the right
+-- to this end, we need polynomial bifunctors, which are just functors, but in two directions
+-- let's construct a data component kit for that with two generic type parameters `x` and `y`
+data K2  a  x y = K2 a
+data Fst    x y = Fst x
+data Snd    x y = Snd y
+data S2 a b x y = L2 (a x y) | R2 (b x y)
+data P2 a b x y = P2 (a x y) (b x y)
+
+-- with eg. again, unit generically defined as a constant
+type One2 = K2 ()
+
+
+class Bifunctor p where
+  bimap :: (a -> b) -> (c -> d) -> p a c -> p b d
+
+instance Bifunctor (K2 a) where
+  bimap f g (K2 a) = K2 a
+
+instance Bifunctor Fst where
+  bimap f g (Fst x) = Fst (f x)
+
+instance Bifunctor Snd where
+  bimap f g (Snd y) = Snd (g y)
+
+instance (Bifunctor p, Bifunctor q) => Bifunctor (S2 p q) where
+  bimap f g (L2 p) = L2 (bimap f g p)
+  bimap f g (R2 q) = R2 (bimap f g q)
+
+instance (Bifunctor p, Bifunctor q) => Bifunctor (P2 p q) where
+  bimap f g (P2 p q) = P2 (bimap f g p) (bimap f g q)
+
+
+-- but.. but.. nothing is missing - we need non-constructable zero
+data Zero
+

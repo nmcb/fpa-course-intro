@@ -1,29 +1,28 @@
 package fpa
 package clowns
 
-enum Expr:
+enum Expr0:
   case Val(i: Int)
-  case Add(e1: Expr, e2: Expr)
+  case Add(e1: Expr0, e2: Expr0)
 
-import Expr.*
+import Expr0.*
 
 
 /** non-tail recursive evaluator */
 
-def eval1(e: Expr): Int =
+def eval1(e: Expr0): Int =
   e match
     case Val(i)      => i
     case Add(e1, e2) => eval1(e1) + eval1(e2)
 
 
-
 /** tail recursive evaluator employing a stack */
 
-type Stack = List[Either[Expr, Int]]
+type Stack = List[Either[Expr0, Int]]
 
-def eval2(e: Expr): Int =
+def eval2(e: Expr0): Int =
 
-  def load(e: Expr)(stk: Stack): Int =
+  def load(e: Expr0)(stk: Stack): Int =
     e match
       case Val(i)      => unload(i)(stk)
       case Add(e1, e2) => load(e1)(Left(e2) :: stk)
@@ -117,21 +116,21 @@ object AddP:
 /** which we do via a type level fix point to tie the knot inductively */
 case class Mu[F[_]](in: F[Mu[F]])
 
-type Expr2 = Mu[ExprP]
+type Expr = Mu[ExprP]
 
-def valM(i: Int): Expr2 =
+def valM(i: Int): Expr =
   Mu(valP(i))
 
-def addM[A](e1: Expr2, e2: Expr2): Expr2 =
+def addM[A](e1: Expr, e2: Expr): Expr =
   Mu(addP(e1, e2))
 
 
-/** this lets us define a fold like recursion operator as a catamorphism */
+/** this lets us define a fold like recursion operator as a catamorphism - see doc/img/cata.png */
 def cata[P[_], A](phi: P[A] => A)(p: Mu[P])(implicit pFunctor: Functor[P]): A =
   phi(pFunctor.fmap(cata(phi))(p.in))
 
 /** with a subsequent evaluator in terms of that catamorphism */
-def  eval3(e: Expr2): Int =
+def  eval3(e: Expr): Int =
   def phi(e: ExprP[Int]): Int =
     e match
       case ValP(i)      => i
@@ -139,14 +138,40 @@ def  eval3(e: Expr2): Int =
       case _            => sys.error("boom")
   cata(phi)(e)
 
+
+/**
+  * we shall see how to turn a cata into a first- order tail-recursion whenever p is polynomial
+  * we shall do this by dissecting p, with ‘clown’ elements left and ‘joker’s on the right
+  * to this end, we need polynomial bifunctors, which are just functors, but in two directions
+  * let's construct a data component kit for that with two generic type parameters `x` and `y`
+  * generic data component kit
+  **/
+case class K2[X, A, B](const: X)                                       // constant
+case class Fst[A, B](a: A)                                             // first identity
+case class Snd[A, B](b: B)                                             // second identity
+enum S2[L[_, _], R[_, _], A, B]:                                       // sum type aka either
+  case L2[L[_, _], R[_, _], A, B](la: L[A, B]) extends S2[L, R, A, B]
+  case R2[L[_, _], R[_, _], A, B](ra: R[A, B]) extends S2[L, R, A, B]
+import S.*
+case class P2[L[_, _], R[_, _], A, B](la: L[A, B], ra: R[A, B])        // product type aka tuple
+
+
+/** and yes - the kit is bifunctorial */
+trait Bifunctor[F[_,_]]:
+  def bimap[A, B, C, D](f: A => B)(g: C => D)(fab: F[A, B]): F[C, D]
+
+implicit def k2Functor[X]: Bifunctor[K2[X, *, *]] =
+  new Bifunctor[K2[X, *, *]]:
+    def bimap[A, B, C, D](f: A => B)(g: C => D)(fab: K2[X, A, B]): K2[X, C, D] = K2(fab.const)
+
 object Main extends App:
 
-  val e = Add(Add(Val(1), Val(2)), Val(3))
+  val e0: Expr0 = Add(Add(Val(1), Val(2)), Val(3))
 
-  val a1 = eval1(e)
-  val a2 = eval2(e)
-  println(s"eval1(e)=$a1")
-  println(s"eval2(e)=$a2")
+  val a1 = eval1(e0)
+  val a2 = eval2(e0)
+  println(s"eval1($e)=$a1")
+  println(s"eval2($e)=$a2")
   assert(a1 == 6)
   assert(a2 == 6)
 
@@ -157,7 +182,8 @@ object Main extends App:
   assert(m1 == R(I(true)))
   assert(m2 == L(K(())))
 
-  val e3 = addM(addM(valM(1), valM(2)), valM(3))
-  val a3 = eval3(e3)
-  println(s"eval3($e3)=$a3")
+  val e: Expr = addM(addM(valM(1), valM(2)), valM(3))
+
+  val a3 = eval3(e)
+  println(s"eval3($e)=$a3")
   assert(a2 == 6)
