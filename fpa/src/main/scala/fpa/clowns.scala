@@ -140,7 +140,7 @@ def  eval3(e: Expr): Int =
 
 
 /**
-  * we shall see how to turn a cata into a first- order tail-recursion whenever p is polynomial
+  * we shall see how to turn a cata into a first-order tail-recursion whenever p is polynomial
   * we shall do this by dissecting p, with ‘clown’ elements left and ‘joker’s on the right
   * to this end, we need polynomial bifunctors, which are just functors, but in two directions
   * let's construct a data component kit for that with two generic type parameters `x` and `y`
@@ -152,17 +152,46 @@ case class Snd[A, B](b: B)                                             // second
 enum S2[L[_, _], R[_, _], A, B]:                                       // sum type aka either
   case L2[L[_, _], R[_, _], A, B](la: L[A, B]) extends S2[L, R, A, B]
   case R2[L[_, _], R[_, _], A, B](ra: R[A, B]) extends S2[L, R, A, B]
-import S.*
+import S2.*
 case class P2[L[_, _], R[_, _], A, B](la: L[A, B], ra: R[A, B])        // product type aka tuple
 
 
 /** and yes - the kit is bifunctorial */
 trait Bifunctor[F[_,_]]:
-  def bimap[A, B, C, D](f: A => B)(g: C => D)(fab: F[A, B]): F[C, D]
+  def bimap[A, B, C, D](f: A => B)(g: C => D)(fab: F[A, C]): F[B, D]
 
 implicit def k2Functor[X]: Bifunctor[K2[X, *, *]] =
   new Bifunctor[K2[X, *, *]]:
-    def bimap[A, B, C, D](f: A => B)(g: C => D)(fab: K2[X, A, B]): K2[X, C, D] = K2(fab.const)
+    def bimap[A, B, C, D](f: A => B)(g: C => D)(fab: K2[X, A, C]): K2[X, B, D] = K2(fab.const)
+
+implicit def fstFunctor: Bifunctor[Fst[*, *]] =
+  new Bifunctor[Fst[*, *]]:
+    def bimap[A, B, C, D](f: A => B)(g: C => D)(fa: Fst[A, C]): Fst[B, D] = Fst(f(fa.a))
+
+implicit def sndFunctor: Bifunctor[Snd[*, *]] =
+  new Bifunctor[Snd[*, *]]:
+    def bimap[A, B, C, D](f: A => B)(g: C => D)(fc: Snd[A, C]): Snd[B, D] = Snd(g(fc.b))
+
+implicit def s2Functor[L[_, _], R[_, _]](implicit lFunctor: Bifunctor[L], rFunctor: Bifunctor[R]): Bifunctor[S2[L, R, *, *]] =
+  new Bifunctor[S2[L, R, *, *]]:
+    def bimap[A, B, C, D](f: A => B)(g: C => D)(fa: S2[L, R, A, C]): S2[L, R, B, D] =
+      fa match
+        case L2(la) => L2(lFunctor.bimap(f)(g)(la))
+        case R2(ra) => R2(rFunctor.bimap(f)(g)(ra))
+
+implicit def p2Functor[L[_, _], R[_, _]](implicit lFunctor: Bifunctor[L], rFunctor: Bifunctor[R]): Bifunctor[P2[L, R, *, *]] =
+  new Bifunctor[P2[L, R, *, *]]:
+    def bimap[A, B, C, D](f: A => B)(g: C => D)(fa: P2[L, R, A, C]): P2[L, R, B, D] =
+      P2(lFunctor.bimap(f)(g)(fa.la), rFunctor.bimap(f)(g)(fa.ra))
+
+
+
+
+/** but.. but.. nothing is missing - we need non-constructable zero */
+sealed trait Zero
+
+def magic[A](z: Zero): A =
+  sys.error("we never get this far")
 
 object Main extends App:
 

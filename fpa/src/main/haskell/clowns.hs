@@ -146,3 +146,6 @@ instance (Bifunctor p, Bifunctor q) => Bifunctor (P2 p q) where
 -- but.. but.. nothing is missing - we need non-constructable zero
 data Zero
 
+magic :: Zero -> a
+magic z = z `seq` error "we never get this far"
+
