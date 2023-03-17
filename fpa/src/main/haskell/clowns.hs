@@ -1,9 +1,11 @@
 {-# language PatternSynonyms        #-}
 
-
 import Data.Char
+import Data.Void
+import Unsafe.Coerce
 
 
+-- the use case is to employ a simple recursive ADT
 data Expr = Val Int | Add Expr Expr
 
 -- non-tail recursive evaluator
@@ -32,45 +34,45 @@ unload v2 (Right v1 : stk) = unload (v1 + v2) stk
 
 -- generic data component kit
 
-data K a   x = K a                -- constant
-data I     x = I x                -- identity
-data S l r x = L (l x) | R (r x)  -- sum type aka either
-data P l r x = P (l x) (r x)      -- product type aka tuple
+data K1 a   x = K1 a                 -- constant
+data I1     x = I1 x                 -- identity
+data S1 l r x = L1 (l x) | R1 (r x)  -- sum type aka either
+data P1 l r x = P1 (l x) (r x)       -- product type aka tuple
 
 
 -- eg. unit generically defined as a constant
 
-type One = K ()
+type One = K1 ()
 
 -- or eg. the option type generically defined as a sum type
 
-type Option = S One I
+type Option = S1 One I1
 
 none :: Option ()
-none   = L (K ())
+none   = L1 (K1 ())
 
 some :: a -> Option a
-some x = R (I x)
+some x = R1 (I1 x)
 
 instance Show a => Show (Option a) where
-  show (L (K ())) = "None"
-  show (R (I x))  = "Some(" ++ show x ++ ")"
+  show (L1 (K1 ())) = "None"
+  show (R1 (I1 x))  = "Some(" ++ show x ++ ")"
 
 
 -- the kit is functorial
 
-instance Functor (K a) where
-  fmap f (K a) = K a
+instance Functor (K1 a) where
+  fmap f (K1 a) = K1 a
 
-instance Functor I where
-  fmap f (I s) = I (f s)
+instance Functor I1 where
+  fmap f (I1 s) = I1 (f s)
 
-instance (Functor l, Functor r) => Functor (S l r) where
-  fmap f (L l) = L (fmap f l)
-  fmap f (R r) = R (fmap f r)
+instance (Functor l, Functor r) => Functor (S1 l r) where
+  fmap f (L1 l) = L1 (fmap f l)
+  fmap f (R1 r) = R1 (fmap f r)
 
-instance (Functor l, Functor r) => Functor (P l r) where
-  fmap f (P l r) = P (fmap f l) (fmap f r)
+instance (Functor l, Functor r) => Functor (P1 l r) where
+  fmap f (P1 l r) = P1 (fmap f l) (fmap f r)
 
 
 -- and our reconstructed option is functorial without further ado
@@ -80,10 +82,10 @@ main1 = print (fmap isDigit (some '1'))
 
 
 -- the expr branching structure is readily described by a polynomial
-type ExprP = S (K Int) (P I I)
+type ExprP = S1 (K1 Int) (P1 I1 I1)
 
-pattern ValP i     = L (K i)
-pattern AddP e1 e2 = R (P (I e1) (I e2))
+pattern ValP i     = L1 (K1 i)
+pattern AddP e1 e2 = R1 (P1 (I1 e1) (I1 e2))
 
 
 -- we would like now to establish the isomorphism: Expr ∼= ExprP Expr
@@ -124,7 +126,7 @@ type One2 = K2 ()
 
 
 class Bifunctor p where
-  bimap :: (a -> b) -> (c -> d) -> p a c -> p b d
+  bimap :: (a -> c) -> (b -> d) -> p a b -> p c d
 
 instance Bifunctor (K2 a) where
   bimap f g (K2 a) = K2 a
@@ -148,4 +150,25 @@ data Zero
 
 magic :: Zero -> a
 magic z = z `seq` error "we never get this far"
+
+inflate1 :: Functor p => p Zero -> p x
+inflate1 = fmap magic
+
+inflate2 :: Functor p => p Zero -> p x
+inflate2 = unsafeCoerce
+
+type Zero1 = K1 Zero
+type Zero2 = K2 Zero
+
+-- with that we can dissect left clowns and right jokers
+data Clown p c j = Clown (p c)
+
+instance Functor f => Bifunctor (Clown f) where
+  bimap f g (Clown pc) = Clown (fmap f pc)
+
+data Joker p c j = Joker (p j)
+
+instance Functor f => Bifunctor (Joker f) where
+  bimap f g (Joker pj)= Joker (fmap g pj)
+
 

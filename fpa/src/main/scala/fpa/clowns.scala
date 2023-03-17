@@ -158,33 +158,31 @@ case class P2[L[_, _], R[_, _], A, B](la: L[A, B], ra: R[A, B])        // produc
 
 /** and yes - the kit is bifunctorial */
 trait Bifunctor[F[_,_]]:
-  def bimap[A, B, C, D](f: A => B)(g: C => D)(fab: F[A, C]): F[B, D]
+  def bimap[A, B, C, D](f: A => C)(g: B => D)(fab: F[A, B]): F[C, D]
 
 implicit def k2Functor[X]: Bifunctor[K2[X, *, *]] =
   new Bifunctor[K2[X, *, *]]:
-    def bimap[A, B, C, D](f: A => B)(g: C => D)(fab: K2[X, A, C]): K2[X, B, D] = K2(fab.const)
+    def bimap[A, B, C, D](f: A => C)(g: B => D)(fab: K2[X, A, B]): K2[X, C, D] = K2(fab.const)
 
 implicit def fstFunctor: Bifunctor[Fst[*, *]] =
   new Bifunctor[Fst[*, *]]:
-    def bimap[A, B, C, D](f: A => B)(g: C => D)(fa: Fst[A, C]): Fst[B, D] = Fst(f(fa.a))
+    def bimap[A, B, C, D](f: A => C)(g: B => D)(fab: Fst[A, B]): Fst[C, D] = Fst(f(fab.a))
 
 implicit def sndFunctor: Bifunctor[Snd[*, *]] =
   new Bifunctor[Snd[*, *]]:
-    def bimap[A, B, C, D](f: A => B)(g: C => D)(fc: Snd[A, C]): Snd[B, D] = Snd(g(fc.b))
+    def bimap[A, B, C, D](f: A => C)(g: B => D)(fab: Snd[A, B]): Snd[C, D] = Snd(g(fab.b))
 
 implicit def s2Functor[L[_, _], R[_, _]](implicit lFunctor: Bifunctor[L], rFunctor: Bifunctor[R]): Bifunctor[S2[L, R, *, *]] =
   new Bifunctor[S2[L, R, *, *]]:
-    def bimap[A, B, C, D](f: A => B)(g: C => D)(fa: S2[L, R, A, C]): S2[L, R, B, D] =
-      fa match
+    def bimap[A, B, C, D](f: A => C)(g: B => D)(fab: S2[L, R, A, B]): S2[L, R, C, D] =
+      fab match
         case L2(la) => L2(lFunctor.bimap(f)(g)(la))
-        case R2(ra) => R2(rFunctor.bimap(f)(g)(ra))
+        case R2(rb) => R2(rFunctor.bimap(f)(g)(rb))
 
 implicit def p2Functor[L[_, _], R[_, _]](implicit lFunctor: Bifunctor[L], rFunctor: Bifunctor[R]): Bifunctor[P2[L, R, *, *]] =
   new Bifunctor[P2[L, R, *, *]]:
-    def bimap[A, B, C, D](f: A => B)(g: C => D)(fa: P2[L, R, A, C]): P2[L, R, B, D] =
-      P2(lFunctor.bimap(f)(g)(fa.la), rFunctor.bimap(f)(g)(fa.ra))
-
-
+    def bimap[A, B, C, D](f: A => C)(g: B => D)(fab: P2[L, R, A, B]): P2[L, R, C, D] =
+      P2(lFunctor.bimap(f)(g)(fab.la), rFunctor.bimap(f)(g)(fab.ra))
 
 
 /** but.. but.. nothing is missing - we need non-constructable zero */
@@ -192,6 +190,35 @@ sealed trait Zero
 
 def magic[A](z: Zero): A =
   sys.error("we never get this far")
+
+/** still, nothing is functorial considering F[Zero] as a container with zero elements */
+def inflate1[F[_], A](fz: F[Zero])(implicit zFunctor: Functor[F]): F[A] =
+  zFunctor.fmap(magic)(fz)
+
+def inflate2[F[_], A](fz: F[Zero])(implicit  zFunctor: Functor[F]): F[A] =
+  fz.asInstanceOf[F[A]]
+
+/** and nothing can be defined in terms of our functorial and bifuncorial kit as the constant zero */
+type Zero1[A]    = K[Zero, A]
+type Zero2[A, B] = K2[Zero, A, B]
+
+/** with that we can dissect left clowns and right jokers */
+case class Clown[F[_], C, J](fc: F[C])
+
+implicit def clownBifunctor[F[_]](implicit functor: Functor[F]): Bifunctor[Clown[F, *, *]] =
+  new Bifunctor[Clown[F, *, *]]:
+    override def bimap[A, B, C, D](f: A => C)(g: B => D)(fab: Clown[F, A, B]): Clown[F, C, D] =
+      Clown(functor.fmap(f)(fab.fc))
+
+/** note that I1 ∼= Fst. */
+
+case class Joker[F[_], C, J](fj: F[J])
+
+implicit def jokerBifunctor[F[_]](implicit functor: Functor[F]): Bifunctor[Joker[F, *, *]] =
+  new Bifunctor[Joker[F, *, *]]:
+    override def bimap[A, B, C, D](f: A => C)(g: B => D)(fab: Joker[F, A, B]): Joker[F, C, D] =
+      Joker(functor.fmap(g)(fab.fj))
+
 
 object Main extends App:
 
