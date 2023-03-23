@@ -1,7 +1,10 @@
 {-# language PatternSynonyms        #-}
+{-# language FunctionalDependencies #-}
+{-# language UndecidableInstances   #-}
+{-# language LambdaCase             #-}
 
 import Data.Char
-import Data.Void
+import Data.Bifunctor
 import Unsafe.Coerce
 
 
@@ -125,9 +128,6 @@ data P2 a b x y = P2 (a x y) (b x y)
 type One2 = K2 ()
 
 
-class Bifunctor p where
-  bimap :: (a -> c) -> (b -> d) -> p a b -> p c d
-
 instance Bifunctor (K2 a) where
   bimap f g (K2 a) = K2 a
 
@@ -164,11 +164,32 @@ type Zero2 = K2 Zero
 data Clown p c j = Clown (p c)
 
 instance Functor f => Bifunctor (Clown f) where
-  bimap f g (Clown pc) = Clown (fmap f pc)
+  bimap f g (Clown p) = Clown (fmap f p)
 
 data Joker p c j = Joker (p j)
 
 instance Functor f => Bifunctor (Joker f) where
-  bimap f g (Joker pj)= Joker (fmap g pj)
+  bimap f g (Joker p)= Joker (fmap g p)
+
+class (Functor p, Bifunctor q) => D p q | p -> q where
+  right :: Either (p j) (q c j, c) -> Either (j, q c j) (p c)
+
+instance D (K1 a) (K2 Zero) where
+  right (Left (K1 a)) = Right (K1 a)
+  right (Right (K2 zero, _)) = magic zero
+
+instance D I1 (K2 ()) where
+  right (Left (I1 j)) = Left (j, K2 ())
+  right (Right (K2 (), c)) = Right (I1 c)
+
+instance (D p p', D q q') => D (S1 p q) (S2 p' q') where
+  right (Left (L1 p)) = (bimap (fmap L2) L1) (right (Left p))
+  right (Left (R1 q)) = (bimap (fmap R2) R1) (right (Left q))
+  right (Right (L2 p, c)) = (bimap (fmap L2) L1) (right (Right (p, c)))
+  right (Right (R2 q, c)) = (bimap (fmap R2) R1) (right (Right (q, c)))
+
+
+instance (D p p', D q q') => D (P1 p q) (S2 (P2 p' (Joker q)) (P2 (Clown p) q')) where
+  right = undefined
 
 
