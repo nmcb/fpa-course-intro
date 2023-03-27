@@ -188,8 +188,40 @@ instance (D p p', D q q') => D (S1 p q) (S2 p' q') where
   right (Right (L2 p, c)) = (bimap (fmap L2) L1) (right (Right (p, c)))
   right (Right (R2 q, c)) = (bimap (fmap R2) R1) (right (Right (q, c)))
 
-
 instance (D p p', D q q') => D (P1 p q) (S2 (P2 p' (Joker q)) (P2 (Clown p) q')) where
-  right = undefined
+  right = rightProd
 
+rightProd
+  :: (D p p', D q q')
+  => Either ((P1 p q) j) ((S2 (P2 p' (Joker q)) (P2 (Clown p) q')) c j, c)
+  -> Either (j, (S2 (P2 p' (Joker q)) (P2 (Clown p) q')) c j) ((P1 p q) c)
+rightProd = \case
+  Left (P1 p q) ->
+    kP q (right (Left p))
+  Right (L2 (P2 p (Joker q)), c) ->
+    kP q (right (Right (p, c)))
+  Right (R2 (P2 (Clown p) q), c) ->
+    kQ p (right (Right (q, c)))
 
+  where
+    kP
+      :: (D p p', D q q')
+      => q j
+      -> Either (j, p' c j) (p c)
+      -> Either (j, (S2 (P2 p' (Joker q)) (P2 (Clown p) q') c j)) ((P1 p q) c)
+    kP q = \case
+      Left (j, p') ->
+        Left (j, L2 (P2 p' (Joker q)))
+      Right p' ->
+        kQ p' (right (Left q))
+
+    kQ
+      :: (D p p', D q q')
+      => p c
+      -> Either (j, q' c j) (q c)
+      -> Either (j, (S2 (P2 p' (Joker q)) (P2 (Clown p) q')) c j) ((P1 p q) c)
+    kQ p = \case
+      Left (j, q') ->
+        Left (j, R2 (P2 (Clown p) q'))
+      Right q' ->
+        Right (P1 p q')
