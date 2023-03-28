@@ -171,9 +171,12 @@ data Joker p c j = Joker (p j)
 instance Functor f => Bifunctor (Joker f) where
   bimap f g (Joker p)= Joker (fmap g p)
 
+
+-- given a left functor and right bifunctor we define a dissection to have an implication on the right
 class (Functor p, Bifunctor q) => D p q | p -> q where
   right :: Either (p j) (q c j, c) -> Either (j, q c j) (p c)
 
+-- with that we can define instances in terms of our left and right component kits
 instance D (K1 a) (K2 Zero) where
   right (Left (K1 a)) = Right (K1 a)
   right (Right (K2 zero, _)) = magic zero
@@ -188,6 +191,7 @@ instance (D p p', D q q') => D (S1 p q) (S2 p' q') where
   right (Right (L2 p, c)) = (bimap (fmap L2) L1) (right (Right (p, c)))
   right (Right (R2 q, c)) = (bimap (fmap R2) R1) (right (Right (q, c)))
 
+-- of which the product type proves to require the most horrifically complex encoding
 instance (D p p', D q q') => D (P1 p q) (S2 (P2 p' (Joker q)) (P2 (Clown p) q')) where
   right = rightProd
 
@@ -203,25 +207,60 @@ rightProd = \case
   Right (R2 (P2 (Clown p) q), c) ->
     kQ p (right (Right (q, c)))
 
-  where
-    kP
-      :: (D p p', D q q')
-      => q j
-      -> Either (j, p' c j) (p c)
-      -> Either (j, (S2 (P2 p' (Joker q)) (P2 (Clown p) q') c j)) ((P1 p q) c)
-    kP q = \case
-      Left (j, p') ->
-        Left (j, L2 (P2 p' (Joker q)))
-      Right p' ->
-        kQ p' (right (Left q))
+kP
+  :: (D p p', D q q')
+  => q j
+  -> Either (j, p' c j) (p c)
+  -> Either (j, (S2 (P2 p' (Joker q)) (P2 (Clown p) q') c j)) ((P1 p q) c)
+kP q = \case
+  Left (j, p') ->
+    Left (j, L2 (P2 p' (Joker q)))
+  Right p' ->
+    kQ p' (right (Left q))
 
-    kQ
-      :: (D p p', D q q')
-      => p c
-      -> Either (j, q' c j) (q c)
-      -> Either (j, (S2 (P2 p' (Joker q)) (P2 (Clown p) q')) c j) ((P1 p q) c)
-    kQ p = \case
-      Left (j, q') ->
-        Left (j, R2 (P2 (Clown p) q'))
-      Right q' ->
-        Right (P1 p q')
+kQ
+  :: (D p p', D q q')
+  => p c
+  -> Either (j, q' c j) (q c)
+  -> Either (j, (S2 (P2 p' (Joker q)) (P2 (Clown p) q')) c j) ((P1 p q) c)
+kQ p = \case
+  Left (j, q') ->
+    Left (j, R2 (P2 (Clown p) q'))
+  Right q' ->
+    Right (P1 p q')
+
+
+-- thus providing us with a tail-recursive catamorphism for phi in term of mu
+cataD :: D p q => (p v -> v) -> Mu p -> v
+cataD phi t =
+  loadD phi t []
+
+loadD :: D p q => (p v -> v) -> Mu p -> [q v (Mu p)] -> v
+loadD phi (In p) =
+  nextD phi (right (Left p))
+
+unloadD :: D p q => (p v -> v) -> v -> [q v (Mu p)] -> v
+unloadD phi v = \case
+  [] ->
+    v
+  q : qs ->
+    nextD phi (right (Right (q, v))) qs
+
+nextD
+  :: D p q
+  => (p v -> v)
+  -> Either (Mu p, q v (Mu p)) (p v)
+  -> [q v (Mu p)]
+  -> v
+nextD phi x s =
+  case x of
+    Left (p, q) ->
+      loadD phi p (q : s)
+    Right p ->
+      unloadD phi (phi p) s
+
+evalD :: Expr2 -> Int
+evalD = cataD phi
+  where
+    phi (ValP n) = n
+    phi (AddP n m) = n + m
