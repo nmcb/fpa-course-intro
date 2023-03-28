@@ -173,25 +173,31 @@ instance Functor f => Bifunctor (Joker f) where
 
 
 -- given a left functor and right bifunctor we define a dissection to have an implication on the right
+-- with that we can define instances in terms of our left and right component kits of which the product
+-- type proves to require the most horrific encoding
 class (Functor p, Bifunctor q) => D p q | p -> q where
   right :: Either (p j) (q c j, c) -> Either (j, q c j) (p c)
 
--- with that we can define instances in terms of our left and right component kits
+-- for constants, we jump from far left to far right in one go; we cannot be in the middle, so we refute that case
 instance D (K1 a) (K2 Zero) where
   right (Left (K1 a)) = Right (K1 a)
   right (Right (K2 zero, _)) = magic zero
 
+-- for identities, ie. single element, we can step into or step out
 instance D I1 (K2 ()) where
   right (Left (I1 j)) = Left (j, K2 ())
   right (Right (K2 (), c)) = Right (I1 c)
 
+-- for sums, we use the instance for the branch appropriate, strip tags beforehand and replace them afterwards
 instance (D p p', D q q') => D (S1 p q) (S2 p' q') where
   right (Left (L1 p)) = (bimap (fmap L2) L1) (right (Left p))
   right (Left (R1 q)) = (bimap (fmap R2) R1) (right (Left q))
   right (Right (L2 p, c)) = (bimap (fmap L2) L1) (right (Right (p, c)))
   right (Right (R2 q, c)) = (bimap (fmap R2) R1) (right (Right (q, c)))
 
--- of which the product type proves to require the most horrifically complex encoding
+-- for products, we start at the left of the first element and end at the right of the second, but we also need
+-- to make things join up in the middle; ie. when we reach the far right of the first component, we must continue
+-- from the far left of the second
 instance (D p p', D q q') => D (P1 p q) (S2 (P2 p' (Joker q)) (P2 (Clown p) q')) where
   right = rightProd
 
@@ -230,22 +236,40 @@ kQ p = \case
     Right (P1 p q')
 
 
--- thus providing us with a tail-recursive catamorphism for phi in term of mu
+-- we put the right operation straight to work. given a dissect p, we can make its fmap operation tail recursive
+-- here, the jokers are the source elements and the clowns are the target elements, thus providing us with a
+-- tail-recursive catamorphism for phi in term of mu
+tmap :: forall a b q p. D p q => (a -> b) -> p a -> p b
+tmap f ps =
+  continue (right (Left ps))
+
+  where
+    continue :: Either (a, q b a) (p b) -> p b
+    continue = \case
+      Left (a, q) ->
+        continue (right (Right (q, f a)))
+      Right p ->
+        p
+
+-- ff we want to define the catamorphism via dissection, we could just replace fmap by tmap in the definition of cata
+-- but that would be cheating!  the point, after all, is to turn a higher-order recursive program into a tail-recursive
+-- machine. we need some kind of stack; s uppose we have a p-algebra  `p v -> v`, and we’re traversing a μ p depth-first
+-- left-to-right, in order to compute a ‘value’ in v.  at any given stage, we’ll be processing a given node, in the
+-- middle of traversing her mother, in the middle of traversing her grandmother, and so on in a maternal line back to
+-- the root.  we’ll have visited all the nodes left of this line and thus have computed `v`s for them;  right of the
+-- line, each element will contain a `μ p` waiting for her turn.  correspondingly, our stack is a list of dissections:
+-- `[D p v (μ p)]`
+
+-- we start, ready to load a tree, with an empty stack
 cataD :: D p q => (p v -> v) -> Mu p -> v
-cataD phi t =
-  loadD phi t []
+cataD phi t = loadD phi t []
 
+-- to load an element, we unpack her container of sub-elements and step in from the far left
 loadD :: D p q => (p v -> v) -> Mu p -> [q v (Mu p)] -> v
-loadD phi (In p) =
-  nextD phi (right (Left p))
+loadD phi (In p) = nextD phi (right (Left p))
 
-unloadD :: D p q => (p v -> v) -> v -> [q v (Mu p)] -> v
-unloadD phi v = \case
-  [] ->
-    v
-  q : qs ->
-    nextD phi (right (Right (q, v))) qs
-
+-- if after a step, we arrive at another sub-element, we load her, suspending the traversal of her mother by
+-- pushing the dissection on the stack
 nextD
   :: D p q
   => (p v -> v)
@@ -259,6 +283,19 @@ nextD phi x s =
     Right p ->
       unloadD phi (phi p) s
 
+-- alternatively, our step might have taken us to the far right of an element, in which case we have all her sub-
+-- elements values:  we are ready to apply the `p v -> v` algebra to get her own value, and start unloading.  once we
+-- have a sub element's value, we may resume the traversal of her mother, pushing the value into her place and moving on
+unloadD :: D p q => (p v -> v) -> v -> [q v (Mu p)] -> v
+unloadD phi v = \case
+  [] ->
+    v
+  q : qs ->
+    nextD phi (right (Right (q, v))) qs
+
+-- on the other hand, if the stack is empty, then we’re holding the value for the root node
+--
+-- so we’re done <3
 evalD :: Expr2 -> Int
 evalD = cataD phi
   where
