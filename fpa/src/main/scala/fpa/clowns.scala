@@ -38,30 +38,30 @@ def eval2(e: Expr0): Int =
 
 /** generic data component kit */
 
-case class K[A,B](a: A)                               // constant
-case class I[A](a: A)                                 // identity
-enum S[L[_], R[_], A]:                                // sum type aka either
-  case L[L[_], R[_], A](la: L[A]) extends S[L, R, A]
-  case R[L[_], R[_], B](ra: R[B]) extends S[L, R, B]
-import S.*
-case class P[L[_], R[_], A](la: L[A], ra: R[A])       // product type aka tuple
+case class K1[A,B](a: A)                               // constant
+case class I1[A](a: A)                                 // identity
+enum S1[L[_], R[_], A]:                                // sum type aka either
+  case L1[L[_], R[_], A](la: L[A]) extends S1[L, R, A]
+  case R1[L[_], R[_], B](ra: R[B]) extends S1[L, R, B]
+import S1.*
+case class P1[L[_], R[_], A](la: L[A], ra: R[A])       // product type aka tuple
 
 
 
 /** eg. unit generically defined as a constant */
 
-type One[A] = K[Unit,A]
+type One[A] = K1[Unit,A]
 
 
 /** or eg. the option type generically defined as a sum type */
 
-type Maybe[A] = S[One,I,A]
+type Maybe[A] = S1[One,I1,A]
 
 def nothing[A]: Maybe[A] =
-  L(K(()))
+  L1(K1(()))
 
 def just[A](a: A): Maybe[A] =
-  R(I(a))
+  R1(I1(a))
 
 
 /** the kit is functorial */
@@ -69,47 +69,47 @@ def just[A](a: A): Maybe[A] =
 trait Functor[F[_]]:
   def fmap[A,B](f: A => B)(fa: F[A]): F[B]
 
-implicit def kFunctor[X]: Functor[K[X, *]] =
-  new Functor[K[X, *]]:
-    def fmap[A, B](f: A => B)(fa: K[X, A]): K[X, B] = K(fa.a)
+implicit def kFunctor[X]: Functor[K1[X, *]] =
+  new Functor[K1[X, *]]:
+    def fmap[A, B](f: A => B)(fa: K1[X, A]): K1[X, B] = K1(fa.a)
 
-implicit def iFunctor: Functor[I[_]] =
-  new Functor[I[_]]:
-    def fmap[A, B](f: A => B)(fa: I[A]): I[B] = I(f(fa.a))
+implicit def iFunctor: Functor[I1[_]] =
+  new Functor[I1[_]]:
+    def fmap[A, B](f: A => B)(fa: I1[A]): I1[B] = I1(f(fa.a))
 
-implicit def sFunctor[L[_], R[_]](implicit lFunctor: Functor[L], rFunctor: Functor[R]): Functor[S[L, R, _]] =
-  new Functor[S[L, R, _]]:
-    def fmap[A, B](f: A => B)(fa: S[L, R, A]): S[L, R, B] =
+implicit def sFunctor[L[_], R[_]](implicit lFunctor: Functor[L], rFunctor: Functor[R]): Functor[S1[L, R, _]] =
+  new Functor[S1[L, R, _]]:
+    def fmap[A, B](f: A => B)(fa: S1[L, R, A]): S1[L, R, B] =
       fa match
-        case L(la) => L(lFunctor.fmap(f)(la))
-        case R(ra) => R(rFunctor.fmap(f)(ra))
+        case L1(la) => L1(lFunctor.fmap(f)(la))
+        case R1(ra) => R1(rFunctor.fmap(f)(ra))
 
-implicit def pFunctor[L[_], R[_]](implicit lFunctor: Functor[L], rFunctor: Functor[R]): Functor[P[L, R, _]] =
-  new Functor[P[L, R, _]]:
-    def fmap[A, B](f: A => B)(fa: P[L, R, A]): P[L, R, B] =
-      P(lFunctor.fmap(f)(fa.la), rFunctor.fmap(f)(fa.ra))
+implicit def pFunctor[L[_], R[_]](implicit lFunctor: Functor[L], rFunctor: Functor[R]): Functor[P1[L, R, _]] =
+  new Functor[P1[L, R, _]]:
+    def fmap[A, B](f: A => B)(fa: P1[L, R, A]): P1[L, R, B] =
+      P1(lFunctor.fmap(f)(fa.la), rFunctor.fmap(f)(fa.ra))
 
 
 /** the expr branching structure is readily described by a polynomial */
-type ExprP[A] = S[K[Int, *], P[I, I, *], A]
+type ExprP[A] = S1[K1[Int, *], P1[I1, I1, *], A]
 
 def valP[A](i: Int): ExprP[A] =
-  L(K(i))
+  L1(K1(i))
 
 object ValP:
   def unapply(ep: ExprP[Int]): Option[Int] =
     ep match
-      case L(K(i)) => Some(i)
-      case _       => None
+      case L1(K1(i)) => Some(i)
+      case _         => None
 
 def addP[A](e1: A, e2: A): ExprP[A] =
-  R(P(I(e1), I(e2)))
+  R1(P1(I1(e1), I1(e2)))
 
 object AddP:
   def unapply(ep: ExprP[Int]): Option[(Int, Int)] =
     ep match
-      case R(P(I(e1), I(e2))) => Some(e1, e2)
-      case _                  => None
+      case R1(P1(I1(e1), I1(e2))) => Some(e1, e2)
+      case _                      => None
 
 
 /** we would like now to establish the isomorphism: Expr ∼= ExprP Expr */
@@ -121,7 +121,7 @@ type Expr = Mu[ExprP]
 def valM(i: Int): Expr =
   Mu(valP(i))
 
-def addM[A](e1: Expr, e2: Expr): Expr =
+def addM(e1: Expr, e2: Expr): Expr =
   Mu(addP(e1, e2))
 
 
@@ -199,7 +199,7 @@ def inflate2[F[_], A](fz: F[Zero])(implicit  zFunctor: Functor[F]): F[A] =
   fz.asInstanceOf[F[A]]
 
 /** and nothing can be defined in terms of our functorial and bifuncorial kit as the constant zero */
-type Zero1[A]    = K[Zero, A]
+type Zero1[A]    = K1[Zero, A]
 type Zero2[A, B] = K2[Zero, A, B]
 
 /** with that we can dissect left clowns and right jokers */
@@ -219,6 +219,12 @@ implicit def jokerBifunctor[F[_]](implicit functor: Functor[F]): Bifunctor[Joker
     override def bimap[A, B, C, D](f: A => C)(g: B => D)(fab: Joker[F, A, B]): Joker[F, C, D] =
       Joker(functor.fmap(g)(fab.fj))
 
+/** given a left functor and right bifunctor we define a dissection to have an implication on the right  */
+/** with that we can define instances in terms of our left and right component kits of which the product */
+/** type proves to require the most horrific encoding                                                    */
+// case class Dissection[P[_], Q[_, _], C, J](p: P[J], q: Q[C, J])(implicit pf: Functor[P[_]], qf: Bifunctor[Q[_, _]]):
+//   def right[A](e: Either[P[J], P1[Q[C, J], C]]): Either[P1[J, Q[C, J]]]
+
 
 object Main extends App:
 
@@ -235,8 +241,8 @@ object Main extends App:
   val m2 = implicitly[Functor[Maybe]].fmap[Char,Boolean](_.isDigit)(nothing[Char])
   println(s"implicitly[Functor[Maybe]].fmap[Char,Boolean](_.isDigit)(just('1'))=$m1")
   println(s"implicitly[Functor[Maybe]].fmap[Char,Boolean](_.isDigit)(nothing[Char])=$m2")
-  assert(m1 == R(I(true)))
-  assert(m2 == L(K(())))
+  assert(m1 == R1(I1(true)))
+  assert(m2 == L1(K1(())))
 
   val e: Expr = addM(addM(valM(1), valM(2)), valM(3))
 

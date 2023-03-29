@@ -12,14 +12,12 @@ import Unsafe.Coerce
 data Expr = Val Int | Add Expr Expr
 
 -- non-tail recursive evaluator
-
 eval1 :: Expr -> Int
 eval1 (Val i)     = i
 eval1 (Add e1 e2) = eval1 e1 + eval1 e2
 
 
 -- tail recursive evaluator employing a stack
-
 type Stack = [Either Expr Int]
 
 eval2 :: Expr -> Int
@@ -36,7 +34,6 @@ unload v2 (Right v1 : stk) = unload (v1 + v2) stk
 
 
 -- generic data component kit
-
 data K1 a   x = K1 a                 -- constant
 data I1     x = I1 x                 -- identity
 data S1 l r x = L1 (l x) | R1 (r x)  -- sum type aka either
@@ -44,11 +41,9 @@ data P1 l r x = P1 (l x) (r x)       -- product type aka tuple
 
 
 -- eg. unit generically defined as a constant
-
 type One = K1 ()
 
 -- or eg. the option type generically defined as a sum type
-
 type Option = S1 One I1
 
 none :: Option ()
@@ -63,7 +58,6 @@ instance Show a => Show (Option a) where
 
 
 -- the kit is functorial
-
 instance Functor (K1 a) where
   fmap f (K1 a) = K1 a
 
@@ -79,7 +73,6 @@ instance (Functor l, Functor r) => Functor (P1 l r) where
 
 
 -- and our reconstructed option is functorial without further ado
-
 main1 :: IO ()
 main1 = print (fmap isDigit (some '1'))
 
@@ -159,6 +152,7 @@ inflate2 = unsafeCoerce
 
 type Zero1 = K1 Zero
 type Zero2 = K2 Zero
+
 
 -- with that we can dissect left clowns and right jokers
 data Clown p c j = Clown (p c)
@@ -293,7 +287,7 @@ unloadD phi v = \case
   q : qs ->
     nextD phi (right (Right (q, v))) qs
 
--- on the other hand, if the stack is empty, then we’re holding the value for the root node
+-- on the other hand, if the stack is empty, then we’re holding the value for the root node..
 --
 -- so we’re done <3
 evalD :: Expr2 -> Int
