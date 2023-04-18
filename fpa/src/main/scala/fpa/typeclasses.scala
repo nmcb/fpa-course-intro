@@ -16,10 +16,11 @@ object library:
 
     /** Q 3: The default should not mask at all */
     given defaultToMaskEverything[A]: Mask[A] =
-      ???
+      _ => "secret"
 
   /** Q 4: We should have a nice syntax - implement it */
-  extension [A : Mask](a: A) def disclose: String = ???
+  extension [A : Mask](a: A) def disclose: String =
+    summon[Mask[A]].disclose(a)
 
 
 object logging:
@@ -28,11 +29,11 @@ object logging:
 
   /** Q 1: implement a client side explicit implicit parameter syntax */
   def loggingMethodUsingMaskExplicitly[A](a: A)(using mask: Mask[A]): String =
-    ???
+    mask.disclose(a)
 
   /** Q 2: Implement a client side implicit implicit parameter syntax */
   def loggingMethodUsingMaskImplicitly[A : Mask](a: A): String =
-    ???
+    summon[Mask[A]].disclose(a)
 
 object service:
 
@@ -61,9 +62,9 @@ object Main extends App:
 
     /** Q 5: BankNumbers should be masked as `BankNumber(masked)` */
     given maskBankNumber: Mask[BankNumber] =
-      ???
+      (bn: BankNumber) => "BankNumber(<hidden>)"
 
   object Customer:
     /** Q 6: Customers should mask the contained BankNumber */
-    given maskCustomer(using Mask[BankNumber]): Mask[Customer] =
-      ???
+    given maskCustomer(using bnMask: Mask[BankNumber]): Mask[Customer] =
+      (c: Customer) => s"Customer(${c.name}, ${bnMask.disclose(c.bankNumber)}"
