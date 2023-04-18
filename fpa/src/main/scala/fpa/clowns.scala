@@ -222,8 +222,6 @@ implicit def jokerBifunctor[F[_]](implicit functor: Functor[F]): Bifunctor[Joker
 /** given a left functor and right bifunctor we define a dissection to have an implication on the right  */
 /** with that we can define instances in terms of our left and right component kits of which the product */
 /** type proves to require the most horrific encoding                                                    */
-// case class Dissection[P[_], Q[_, _], C, J](p: P[J], q: Q[C, J])(implicit pf: Functor[P[_]], qf: Bifunctor[Q[_, _]]):
-//   def right[A](e: Either[P[J], P1[Q[C, J], C]]): Either[P1[J, Q[C, J]]]
 
 
 object Main extends App:
