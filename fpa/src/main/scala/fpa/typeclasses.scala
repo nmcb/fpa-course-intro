@@ -22,7 +22,7 @@ object library:
   extension [A : Mask](a: A) def disclose: String = ???
 
 
-object module:
+object logging:
 
   import library.*
 
@@ -34,8 +34,13 @@ object module:
   def loggingMethodUsingMaskImplicitly[A : Mask](a: A): String =
     ???
 
+object service:
+
+  import library.*
+  import logging.*
+
   /** Example client-client-side usages of given functions above */
-  def serviceMethodUsingLoggingMethodUsingMaskNothingMask[A](a: A): String =
+  def serviceMethodUsingLoggingMethodUsingMaskNothingMaskExplicitly[A](a: A): String =
     loggingMethodUsingMaskExplicitly(a)(using Mask.maskNothing)
 
   def serviceMethodUsingLoggingMethodUsingImplicitlyProvidedMask[A : Mask](a: A): String =
