@@ -15,7 +15,7 @@ lazy val cats: Seq[ModuleID] =
 lazy val test: Seq[ModuleID] =
   Seq(scalaTest, scalaCheck).map(_ % Test)
 
-lazy val root: Project =
+lazy val course: Project =
   (project in file("."))
     .aggregate(fpa, fps)
 
