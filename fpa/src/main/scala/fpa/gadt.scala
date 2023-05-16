@@ -39,12 +39,12 @@ object GADT extends App:
   // Declaration-Site Variance - Ie. Open GADTs
   //
   // Scala supports declaration-site variance, a convenient way of
-  // defining subtyping relation- ships between parameterized types.
+  // defining subtyping relationships between parameterized types.
   // For instance, in Figure 1 we could make Expr covariant to encode
-  // the λ calculus with subtyping. However, Dotty then rejects our
+  // the λ calculus with subtyping. However, Scala then rejects our
   // definition of eval as ill-typed, and requires adding unsafe casts.
   //
   // It is unclear whether definitions like eval actually are unsafe,
-  // or whether Dotty is overly conservative; indeed, sound typing rules
+  // or whether Scala is overly conservative; indeed, sound typing rules
   // for pattern matching on open GADTs is an open problem!
 
