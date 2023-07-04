@@ -1,6 +1,44 @@
-bar :: (forall a . a -> a) -> (Int, Bool)
-bar id = (id 1, id True)
+-- Some instances and utilities
+--
+-- Given the standard type classes for functors, applicative functors and monads:
+--
 
+-----
+
+-- class Functor f where
+--   fmap :: (a -> b) -> f a -> f b
+--
+-- class Functor f => Applicative f where
+--   pure :: a -> f a
+--   (<*>) :: f (a -> b) -> f a -> f b
+--
+-- class Applicative f => Monad f where
+--   return :: a -> f a
+--   (>>=) :: f a -> (a -> f b) -> f b
+--
+
+-----
+
+-- Give instances for all three classes for the following data types:
+--
+-- data Tree a = Leaf a | Node (Tree a) (Tree a)
+--
+-- data RoseTree a = RoseNode a [RoseTree a] | RoseLeaf
+--
+
+-----
+
+-- Foldable and traversable
+--
+-- Also give instances for the Foldable and Traversable classes, whenever possible:
+--
+-- class Foldable t where
+--   foldMap :: Monoid m => (a -> m) -> t a -> m
+--
+-- class Traversable t where
+--   traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
+
+-----
 
 data Tree a = Leaf a | Node (Tree a) (Tree a) deriving Show
 
