@@ -1,44 +1,7 @@
--- Some instances and utilities
---
--- Given the standard type classes for functors, applicative functors and monads:
---
+import Prelude hiding (lookup)
+import Data.Map
 
------
-
--- class Functor f where
---   fmap :: (a -> b) -> f a -> f b
---
--- class Functor f => Applicative f where
---   pure :: a -> f a
---   (<*>) :: f (a -> b) -> f a -> f b
---
--- class Applicative f => Monad f where
---   return :: a -> f a
---   (>>=) :: f a -> (a -> f b) -> f b
---
-
------
-
--- Give instances for all three classes for the following data types:
---
--- data Tree a = Leaf a | Node (Tree a) (Tree a)
---
--- data RoseTree a = RoseNode a [RoseTree a] | RoseLeaf
---
-
------
-
--- Foldable and traversable
---
--- Also give instances for the Foldable and Traversable classes, whenever possible:
---
--- class Foldable t where
---   foldMap :: Monoid m => (a -> m) -> t a -> m
---
--- class Traversable t where
---   traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
-
------
+-- part 1
 
 data Tree a = Leaf a | Node (Tree a) (Tree a) deriving Show
 
@@ -147,7 +110,19 @@ main6 = putStrLn (show (roseTree >>= func6))
 -- foldable
 main9 = putStrLn (show (foldMap IntM roseTree))
 
-
 -- traversable
-func10 a = [a]
+func10 a = [a,a]
 main10   = putStrLn (show (traverse func10 roseTree))
+
+
+-- part 2
+
+lookupAll :: Ord k => [k] -> Map k v -> Maybe [v]
+lookupAll ks m = sequence results
+  where results = do
+                    ss <- ks
+                    return (lookup ss m)
+
+testMap = fromList [(0, "zero"), (1, "one"), (2, "two")]
+
+main11 = putStrLn (show (lookupAll [0, 2] testMap))
