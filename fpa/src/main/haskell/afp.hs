@@ -1,28 +1,34 @@
-import Prelude hiding (lookup)
-import Data.Map
-import Data.Maybe
+import qualified Data.Map   as M
+import qualified Data.Maybe as O
+import qualified Data.List  as L
 
 -- part 1
 
 data Tree a = Leaf a | Node (Tree a) (Tree a) deriving Show
 
 instance Functor Tree where
+  fmap :: (a -> b) -> Tree a -> Tree b
   fmap f (Leaf a)   = Leaf (f a)
   fmap f (Node l r) = Node (fmap f l) (fmap f r)
 
 instance Applicative Tree where
+  pure :: a -> Tree a
   pure = Leaf
 
+  (<*>) :: Tree (a -> b) -> Tree a -> Tree b
   Leaf f   <*> t = fmap f t
   Node l r <*> t = Node (l <*> t) (r <*> t)
 
 instance Monad Tree where
+  return :: a -> Tree a
   return = pure
 
+  (>>=) :: Tree a -> (a -> Tree b) -> Tree b
   Leaf a   >>= f = f a
   Node l r >>= f = Node (l >>= f) (r >>= f)
 
 instance Foldable Tree where
+  foldMap :: Monoid m => (a -> m) -> Tree a -> m 
   foldMap f (Leaf a)   = f a
   foldMap f (Node l r) = foldMap f l `mappend` foldMap f r
 
@@ -66,24 +72,30 @@ main8   = putStrLn (show (traverse func8 tree))
 data RoseTree a = RoseNode a [RoseTree a] | RoseLeaf deriving Show
 
 instance Functor RoseTree where
+  fmap :: (a -> b) -> RoseTree a -> RoseTree b
   fmap f RoseLeaf        = RoseLeaf
   fmap f (RoseNode a ts) = RoseNode (f a) (fmap (fmap f) ts)
 
 instance Applicative RoseTree where
+  pure :: a -> RoseTree a
   pure a = RoseNode a []
 
+  (<*>) :: RoseTree (a -> b) -> RoseTree a -> RoseTree b
   RoseLeaf      <*> RoseLeaf      = RoseLeaf
   RoseNode f fs <*> RoseNode a ts = RoseNode (f a) (zipWith (<*>) fs ts)
 
 instance Monad RoseTree where
+  return :: a -> RoseTree a
   return = pure
 
+  (>>=) :: RoseTree a -> (a -> RoseTree b) -> RoseTree b
   RoseLeaf      >>= _ = RoseLeaf
   RoseNode a ts >>= f = case f a of
     RoseLeaf      -> RoseLeaf
     RoseNode b ns -> RoseNode b (ns ++ fmap (>>= f) ts)
 
 instance Foldable RoseTree where
+  foldMap :: Monoid m => (a -> m) -> RoseTree a -> m 
   foldMap _ RoseLeaf            = mempty
   foldMap f (RoseNode a ts) = f a `mappend` (foldMap (foldMap f) ts)
 
@@ -118,12 +130,16 @@ main10   = putStrLn (show (traverse func10 roseTree))
 
 -- part 2
 
-lookupAll :: Ord k => [k] -> Map k v -> Maybe [v]
-lookupAll ks m = sequence $ ks >>= (\s -> return $ lookup s m)
+lookupAll :: Ord k => [k] -> M.Map k v -> Maybe [v]
+lookupAll ks m = sequence $ ks >>= (\s -> return $ M.lookup s m)
 
-lookupSome :: Ord k => [k] -> Map k v -> [v]
-lookupSome ks m = ks >>= (\s -> maybeToList $ lookup s m)
+lookupSome :: Ord k => [k] -> M.Map k v -> [v]
+lookupSome ks m = ks >>= (\s -> O.maybeToList $ M.lookup s m)
 
-testMap = fromList [(0, "zero"), (1, "one"), (2, "two")]
+gfilter :: Foldable f => (a -> Bool) -> f a -> [a]
+gfilter f m = filter f (foldMap L.singleton m)
+
+testMap = M.fromList [(0, "zero"), (1, "one"), (2, "two")]
 main11 = putStrLn (show (lookupAll  [0, 2] testMap))
 main12 = putStrLn (show (lookupSome [0, 2] testMap))
+main13 = putStrLn (show (gfilter (>2) roseTree))
