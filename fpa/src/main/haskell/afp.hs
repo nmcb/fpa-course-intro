@@ -1,5 +1,6 @@
 import Prelude hiding (lookup)
 import Data.Map
+import Data.Maybe
 
 -- part 1
 
@@ -118,11 +119,11 @@ main10   = putStrLn (show (traverse func10 roseTree))
 -- part 2
 
 lookupAll :: Ord k => [k] -> Map k v -> Maybe [v]
-lookupAll ks m = sequence results
-  where results = do
-                    ss <- ks
-                    return (lookup ss m)
+lookupAll ks m = sequence $ ks >>= (\s -> return $ lookup s m)
+
+lookupSome :: Ord k => [k] -> Map k v -> [v]
+lookupSome ks m = ks >>= (\s -> maybeToList $ lookup s m)
 
 testMap = fromList [(0, "zero"), (1, "one"), (2, "two")]
-
-main11 = putStrLn (show (lookupAll [0, 2] testMap))
+main11 = putStrLn (show (lookupAll  [0, 2] testMap))
+main12 = putStrLn (show (lookupSome [0, 2] testMap))
