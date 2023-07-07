@@ -11,6 +11,16 @@ trait Functor[F[_]]:
     def |@|(fa: F[A]): F[B] =
       fmap(f)(fa)
 
+trait Applicative[F[_] : Applicative]:
+  def pure[A](a: A): F[A]
+
+  def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]
+
+  extension [A,B](ff: F[A => B])
+    def |~|(fa: F[A]): F[B] =
+      ap(ff)(fa)
+
+
 object Tree:
 
   given Functor[Tree] with
