@@ -1,6 +1,7 @@
 package afp
 
 trait Monoid[A]:
+
   def emptyt(a: A): A
 
   def append(l: A)(r: A): A
@@ -23,6 +24,7 @@ trait Applicative[F[_]](using val functor: Functor[F]):
   def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]
 
   extension [A,B](ff: F[A => B])
+
     def |*|(fa: F[A]): F[B] =
       ap(ff)(fa)
 
@@ -34,10 +36,12 @@ trait Monad[F[_]](using applicative: Applicative[F]):
   def flatMap[A,B](fa: F[A])(f: A => F[B]): F[B]
 
   extension  [A](fa: F[A])
+
     def >>=[B](f: A => F[B]): F[B] =
       flatMap(fa)(f)
 
 trait Foldable[F[_]]:
+
   def foldMap[A,B:Monoid](f: A => B)(fa: F[A]): B
 
 trait Traversable[G[_]](using functor: Functor[G], foldable: Foldable[G]):
@@ -73,6 +77,7 @@ object Tree:
         case Node(l, r) => Node(l >>= f, r >>= f)
 
   given Foldable[Tree] with
+
     def foldMap[A,B:Monoid](f: A => B)(fa: Tree[A]): B =
       fa match
         case Leaf(a)    => f(a)
