@@ -88,5 +88,5 @@ object Tree:
     def traverse[A,B,F[_]](f: A => F[B])(t: Tree[A])(using applicative: Applicative[F]): F[Tree[B]] =
       import applicative.functor.*
       t match
-        case Leaf(a)    => map(Leaf.apply[B])(f(a))
-        case Node(l, r) => map(Node.apply[B].curried)(traverse(f)(l)) |*| traverse(f)(r)
+        case Leaf(a)    => Leaf.apply[B] |@| f(a)
+        case Node(l, r) => Node.apply[B].curried |@| traverse(f)(l) |*| traverse(f)(r)
