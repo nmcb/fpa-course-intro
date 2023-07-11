@@ -18,7 +18,7 @@ trait Functor[F[_]]:
 trait Applicative[F[_]](using val functor: Functor[F]):
   def pure[A](a: A): F[A]
 
-  def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]
+  def ap[A,B](ff: F[A => B])(fa: F[A]): F[B]
 
   extension [A,B](ff: F[A => B])
     def |*|(fa: F[A]): F[B] =
@@ -38,7 +38,7 @@ trait Foldable[F[_]]:
   def foldMap[A,B](f: A => B)(fa: F[A])(using monoid: Monoid[B]): B
 
 trait Traversable[F[_]](using val functor: Functor[F], val foldable: Foldable[F]):
-  def traverse[A,B,G[_]:Applicative](f: A => G[B])(ga: F[A]): G[F[B]]
+  def traverse[A,B,G[_]](f: A => G[B])(ga: F[A])(using applicative: Applicative[G]): G[F[B]]
 
 enum Tree[+A]:
   case Leaf[A](a: A)                           extends Tree[A]
@@ -67,7 +67,7 @@ object Tree:
         case Node(l, r) => Node(l >>= f, r >>= f)
 
   given Foldable[Tree] with
-    def foldMap[A,B:Monoid](f: A => B)(fa: Tree[A]): B =
+    def foldMap[A,B](f: A => B)(fa: Tree[A])(using monoid: Monoid[B]): B =
       fa match
         case Leaf(a)    => f(a)
         case Node(l, r) => foldMap(f)(l) <> foldMap(f)(r)
