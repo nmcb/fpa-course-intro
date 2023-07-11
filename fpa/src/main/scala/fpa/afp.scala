@@ -24,7 +24,7 @@ trait Applicative[F[_]](using val functor: Functor[F]):
     def |*|(fa: F[A]): F[B] =
       ap(ff)(fa)
 
-trait Monad[F[_]](using applicative: Applicative[F]):
+trait Monad[F[_]](using val applicative: Applicative[F]):
   def unit[A](a: A): F[A] =
     applicative.pure(a)
 
@@ -37,8 +37,8 @@ trait Monad[F[_]](using applicative: Applicative[F]):
 trait Foldable[F[_]]:
   def foldMap[A,B:Monoid](f: A => B)(fa: F[A]): B
 
-trait Traversable[G[_]](using functor: Functor[G], foldable: Foldable[G]):
-  def traverse[A,B,F[_]:Applicative](f: A => F[B])(ga: G[A]): F[G[B]]
+trait Traversable[F[_]](using val functor: Functor[F], foldable: Foldable[F]):
+  def traverse[A,B,G[_]:Applicative](f: A => G[B])(ga: F[A]): G[F[B]]
 
 enum Tree[+A]:
   case Leaf[A](a: A)                           extends Tree[A]
@@ -76,5 +76,5 @@ object Tree:
     def traverse[A,B,F[_]](f: A => F[B])(t: Tree[A])(using applicative: Applicative[F]): F[Tree[B]] =
       import applicative.functor.*
       t match
-        case Leaf(a)    => Leaf.apply[B] |@| f(a)
+        case Leaf(a)    => Leaf.apply[B]         |@| f(a)
         case Node(l, r) => Node.apply[B].curried |@| traverse(f)(l) |*| traverse(f)(r)
