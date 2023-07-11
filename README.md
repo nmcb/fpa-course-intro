@@ -41,3 +41,4 @@ The tests associated which each individual chapter are configured to be ignored.
 - 2018-10-04 : Canceled
 - 2018-10-11 : Y, oh Y, oh Y, oh Y?
 - 2019-04-31 : Done
+- 2023-07-11 : Added Advanced Haskell Summer School exercises 
