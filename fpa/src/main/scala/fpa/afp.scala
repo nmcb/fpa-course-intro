@@ -37,7 +37,7 @@ trait Monad[F[_]](using val applicative: Applicative[F]):
 trait Foldable[F[_]]:
   def foldMap[A,B](f: A => B)(fa: F[A])(using monoid: Monoid[B]): B
 
-trait Traversable[F[_]](using val functor: Functor[F], foldable: Foldable[F]):
+trait Traversable[F[_]](using val functor: Functor[F], val foldable: Foldable[F]):
   def traverse[A,B,G[_]:Applicative](f: A => G[B])(ga: F[A]): G[F[B]]
 
 enum Tree[+A]:
