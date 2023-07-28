@@ -21,7 +21,7 @@ sbt:fpa-course-intro> ~test
 1. Waiting for source changes... (press enter to interrupt)
 ```
 
-The tests associated which each individual chapter are configured to be ignored.  Remove the `@Ignore` annotation for the chapter you want to work on.  Also, lots of the course is WIP, so expect parts to be commented out sometimes.  Just play around and have fun.
+Tests associated which each individual chapter are configured to be ignored.  Remove the `@Ignore` annotation for the chapter you want to work on.  Also, lots of the course is WIP, so expect parts to be commented out sometimes.  Just play around and have fun.
 
 ---
 
@@ -41,3 +41,4 @@ The tests associated which each individual chapter are configured to be ignored.
 - 2018-10-04 : Canceled
 - 2018-10-11 : Y, oh Y, oh Y, oh Y?
 - 2019-04-31 : Done
+- 2023-07-11 : Added Advanced Haskell Summer School exercises 

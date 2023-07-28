@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Temurin Eclipse JDK 17
+    - name: Set up Temurin Eclipse JDK 20
       uses: actions/setup-java@v2
       with:
-        java-version: '17'
+        java-version: '20'
         distribution: 'temurin'
     - name: Run tests
       run: sbt test
