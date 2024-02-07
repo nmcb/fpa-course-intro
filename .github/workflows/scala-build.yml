@@ -2,9 +2,9 @@ name: Scala CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.1.0
     - name: Set up Temurin Eclipse JDK 20
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3.6.0
       with:
         java-version: '20'
         distribution: 'temurin'
