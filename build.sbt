@@ -25,7 +25,7 @@ lazy val fpa: Project =
       scalaVersion         := "3.6.3",
       name                 := "fpa-course-intro",
       libraryDependencies ++= cats ++ test,
-      scalacOptions       ++= Seq("-Ykind-projector:underscores"),
+      scalacOptions       ++= Seq("-Xkind-projector"),
       run / javaOptions    += "-Xss1m"
     )
 
