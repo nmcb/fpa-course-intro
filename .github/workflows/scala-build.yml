@@ -1,4 +1,4 @@
-name: scala-build
+name: build
 
 on:
   push:
@@ -8,9 +8,8 @@ on:
 
 jobs:
   build:
-
+    name: scala-build
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - name: setup-java
