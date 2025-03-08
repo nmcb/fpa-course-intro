@@ -22,7 +22,7 @@ lazy val course: Project =
 lazy val fpa: Project =
   (project in file("fpa"))
     .settings(
-      scalaVersion         := "3.6.3",
+      scalaVersion         := "3.6.4",
       name                 := "fpa-course-intro",
       libraryDependencies ++= cats ++ test,
       scalacOptions       ++= Seq("-Ykind-projector:underscores"),
@@ -32,7 +32,7 @@ lazy val fpa: Project =
 lazy val fps: Project =
   (project in file("fps"))
     .settings(
-      scalaVersion         := "3.6.3",
+      scalaVersion         := "3.6.4",
       name                 := "fps-course",
       libraryDependencies ++= cats ++ test
     )
