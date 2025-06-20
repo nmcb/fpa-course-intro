@@ -1,0 +1,3 @@
+pullRequests.grouping = [
+  { name = "dependencies", title = "dependency updates", "filter" = [{"group" = "*"}] }
+]
