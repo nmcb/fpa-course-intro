@@ -7,5 +7,5 @@ object Dependencies {
   lazy val catsEffect    = "org.typelevel"  %% "cats-effect"    % "3.6.3"
 
   lazy val scalaTest     = "org.scalatest"  %% "scalatest"      % "3.2.19"
-  lazy val scalaCheck    = "org.scalacheck" %% "scalacheck"     % "1.18.1"
+  lazy val scalaCheck    = "org.scalacheck" %% "scalacheck"     % "1.19.0"
 }
