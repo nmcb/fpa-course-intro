@@ -36,7 +36,8 @@ object Pure {
   final case class Cont[A, B](p: Pure[A], f: A => Pure[B])  extends Pure[B]
 }
 
-object MainPure extends App {
+object MainPure {
+
   import Pure._
   def ack(m: Int, n: Int): Pure[Int] = (m,n) match {
     case (0,_) => pure(n + 1)
@@ -49,5 +50,8 @@ object MainPure extends App {
 
   val m = 3
   val n = 12
-  println(s"ack($m,$n) = ${ack(m,n).compute}")
+
+  @main
+  def runPure(args: String*): Unit =
+    println(s"ack($m,$n) = ${ack(m,n).compute}")
 }

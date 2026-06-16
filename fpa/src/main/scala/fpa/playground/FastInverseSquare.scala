@@ -1,10 +1,9 @@
 package fpa
 package playground
-package math
 
 import scala.util.Random
 
-object MainFastInverseSquare extends App {
+object FastInverseSquare {
 
   // fast inverse sqrt implementation - https://youtu.be/p8u_k2LIZyo
 
@@ -47,10 +46,11 @@ object MainFastInverseSquare extends App {
   def avg(xs: IndexedSeq[Long]): Double =
     xs.foldLeft(0L)(_ + _).toDouble / xs.length.toDouble
 
-  val (mis,fis) = test.unzip
-  println(s"avg: fisqrt = misqrt * ${avg(fis) / avg(mis)}")
-
-  // avg := fisqrt = misqrt * 0.9388888888888889  // -- ie. less than 7% faster ;)
+  @main
+  def runFastInverseSquare(args: String*): Unit =
+    val (mis,fis) = test.unzip
+    println(s"avg: fisqrt = misqrt * ${avg(fis) / avg(mis)}")
+    // avg := fisqrt = misqrt * 0.9388888888888889  // -- ie. less than 7% faster ;)
 }
 
 

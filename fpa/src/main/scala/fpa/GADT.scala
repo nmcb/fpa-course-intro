@@ -1,6 +1,6 @@
 package fpa
 
-object GADT extends App:
+object GADT:
 
   enum Expr[A]:
     case Var[A](a: A)                               extends Expr[A]
@@ -36,7 +36,7 @@ object GADT extends App:
   // pattern f: Fun[a,b] to bind the uncovered existential type a so we
   // can use it in a required type annotation.
   //
-  // Declaration-Site Variance - Ie. Open GADTs
+  // Declaration-Site Variance - I.e. Open GADTs
   //
   // Scala supports declaration-site variance, a convenient way of
   // defining subtyping relationships between parameterized types.

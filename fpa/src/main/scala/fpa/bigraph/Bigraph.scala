@@ -1,11 +1,10 @@
 package fpa
 package bigraph
 
-object Main extends App {
+object Bigraph {
 
   // dependencies
 
-  // type Set[A]    = scala.collection.Set[A]
   type Forest[N] = scala.collection.IndexedSeq[Tree[N]]
 
 

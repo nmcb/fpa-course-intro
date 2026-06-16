@@ -1,13 +1,14 @@
-package fpa.playground.java;
+package fpa.playground;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class MainParallelSort {
+public class JavaParallelSort {
+    
     public static void main(String[] args) {
-        MainParallelSort mySort = new MainParallelSort();
+        JavaParallelSort mySort = new JavaParallelSort();
          
         int[] src = null;
  
@@ -43,7 +44,7 @@ public class MainParallelSort {
      
     private int[] getData() {
         try {
-            BufferedImage image = ImageIO.read(Objects.requireNonNull(MainParallelSort.class.getResourceAsStream("/image.png")));
+            BufferedImage image = ImageIO.read(Objects.requireNonNull(JavaParallelSort.class.getResourceAsStream("/image.png")));
             int w = image.getWidth();
             int h = image.getHeight();
             int[] src = image.getRGB(0, 0, w, h, null, 0, w);

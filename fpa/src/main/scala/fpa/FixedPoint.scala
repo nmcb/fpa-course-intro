@@ -1,6 +1,6 @@
 package fpa
 
-object fixpoint {
+object FixedPoint {
 
   /*** We're going to implement a HList using fixed-points at type level ***/
 
