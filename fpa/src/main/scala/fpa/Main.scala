@@ -1,41 +1,40 @@
 package fpa
-package monaderror
 
 import cats._
 import cats.data._
 import cats.effect._
 
-object Main extends App {
+object Main:
 
   /** Functional errors */
-  sealed trait Deviation
-  case class RoomAlreadyExist() extends Deviation
+  private sealed trait Deviation
+  private case class RoomAlreadyExist() extends Deviation
 
   /** The monadic result stack */
-  type Result[A]  = Either[Deviation, A]
-  type ResultT[A] = EitherT[IO, Deviation, A]
+  private type Result[A]  = Either[Deviation, A]
+  private type ResultT[A] = EitherT[IO, Deviation, A]
 
-  val ResultT = EitherT
+  private val ResultT = EitherT
 
-  case class Room(id: Long)
+  private case class Room(id: Long)
 
   /** Some call that succeeds and wraps it result as: */
-  val callWhichSucceeds: ResultT[Room] =
+  private val callWhichSucceeds: ResultT[Room] =
     ResultT.pure[IO, Deviation](Room(666))
 
   /** Some call that deviates and wraps it result as: */
-  val callWhichDeviates: ResultT[Room] =
+  private val callWhichDeviates: ResultT[Room] =
     ResultT.leftT[IO, Room](RoomAlreadyExist())
 
   /** Some call that throws and wraps it result as: */
-  val callWhichThrows: ResultT[Room] =
+  private val callWhichThrows: ResultT[Room] =
     MonadError[ResultT, Throwable].raiseError(new RuntimeException("Boom!"))
 
 
-  object http {
+  private object http {
 
     /** Pretend a response is a http code and a body */
-    type Response = String
+    private type Response = String
 
     /** Interface to "compute" a response string from a result and code */
     trait Http[A] {
@@ -54,7 +53,7 @@ object Main extends App {
       case Right(value)    => value.toResponse(code)
     }
 
-    case class ServerError(msg: String) extends Deviation
+    private case class ServerError(msg: String) extends Deviation
 
     implicit def httpResultT[A : Http]: Http[ResultT[A]] =
       (result: ResultT[A]) => (code: Int) => {
@@ -72,7 +71,7 @@ object Main extends App {
 
   import http._
 
-  val prog = for {
+  val prog: IO[Unit] = for {
     _ <- callWhichSucceeds.toResponse(201).map(println)
     _ <- callWhichDeviates.toResponse(200).map(println)
     _ <- callWhichThrows.toResponse(500).map(println)
@@ -80,5 +79,6 @@ object Main extends App {
 
   import cats.effect.unsafe.implicits.global
 
-  prog.unsafeRunSync()
-}
+  @main
+  def run(args: String*): Unit =
+    prog.unsafeRunSync()

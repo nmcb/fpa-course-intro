@@ -8,7 +8,7 @@ import effect._
 import scala.concurrent.Future
 import scala.io.StdIn
 
-object Main extends App {
+object Main {
 
   /** Let's have a look at equational reasoning, given the pure function `twice` : */
   def twice[A : Semigroup](a1: A, a2: A): A = Semigroup[A].combine(a1, a2)

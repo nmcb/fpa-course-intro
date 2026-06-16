@@ -1,6 +1,7 @@
-import Dependencies._
+import Dependencies.*
 
 ThisBuild / organization := "fpa"
+ThisBuild / scalaVersion := "3.8.4"
 ThisBuild / version      := "0.1.0"
 ThisBuild / scalacOptions ++= Seq(
   "-unchecked",
@@ -22,17 +23,15 @@ lazy val course: Project =
 lazy val fpa: Project =
   (project in file("fpa"))
     .settings(
-      scalaVersion         := "3.8.4",
       name                 := "fpa-course-intro",
       libraryDependencies ++= cats ++ test,
-      scalacOptions       ++= Seq("-Ykind-projector:underscores"),
+      scalacOptions       ++= Seq("-Xkind-projector:underscores"),
       run / javaOptions    += "-Xss1m"
     )
 
 lazy val fps: Project =
   (project in file("fps"))
     .settings(
-      scalaVersion         := "3.8.4",
       name                 := "fps-course",
       libraryDependencies ++= cats ++ test
     )

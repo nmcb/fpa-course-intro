@@ -1,5 +1,4 @@
 package fps
-package nmcb
 
 // compiler programmer code down below
 
@@ -30,7 +29,7 @@ case class Cell[A](a: A, rest: Multiple[A]) extends Multiple[A]
 
 object Multiple:
 
-  def empty[A]: Multiple[A] =
+  private def empty[A]: Multiple[A] =
     Empty
 
   def apply[A](as: A*): Multiple[A] =
@@ -47,18 +46,20 @@ object Multiple:
     def map[B](f: A => B): Multiple[B] =
       F.map(f)(ma)
 
-// application programmerrcode ammer down below
+// application code example usage down below
 
-object Test extends App:
+object Test:
 
-  case class Person(name: String, age: Int)
+  private case class Person(name: String, age: Int)
 
-  val fixture: Seq[Person] =
+  private val fixture: Seq[Person] =
     Seq(
       Person("John Doe", 42),
       Person("Jane Doe", 43),
       Person("Jake Joe", 41)
     )
 
-  assert(fixture.find(_.age == 41) == Some(Person("Jake Joe", 41)))
-  assert(fixture.find(_.age == 40) == None)
+  @main
+  def run(args: String*): Unit =
+    assert(fixture.find(_.age == 41).contains(Person("Jake Joe", 41)))
+    assert(!fixture.exists(_.age == 40))
