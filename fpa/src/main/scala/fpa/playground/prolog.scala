@@ -3,15 +3,15 @@ package playground
 
 object prolog {
 
-  type UpperCase = String
-  type LowerCase = String
-  type Tag       = String
+  private type UpperCase = String
+  private type LowerCase = String
+  private type Tag       = String
 
   sealed trait Term
-  case class Var(name: UpperCase)                    extends Term
-  case class Fun(name: LowerCase, terms: List[Term]) extends Term
+  private case class Var(name: UpperCase)                    extends Term
+  private case class Fun(name: LowerCase, terms: List[Term]) extends Term
 
-  type TaggedTerm = (Tag, Term)
+  private type TaggedTerm = (Tag, Term)
 
   case class Rule(lhs: Term, rhs: List[Term])
 
@@ -31,7 +31,7 @@ object prolog {
     }
   }
 
-  implicit def taggablerule(implicit T: Taggable[List[Term]]): Taggable[Rule] = new Taggable[Rule] {
+  implicit def taggableRule(implicit T: Taggable[List[Term]]): Taggable[Rule] = new Taggable[Rule] {
     override def tag(t: Tag)(rule: Rule): Rule = Rule(rule.lhs, T.tag(t)(rule.rhs))
   }
 
@@ -40,11 +40,11 @@ object prolog {
   def emptyEnv: Option[Env] =
     Some(Env(Map.empty))
 
-  type ApplyRule = (Tag, Rule, Result)
+  private type ApplyRule = (Tag, Rule, Result)
 
   sealed trait Result
-  case class Done(env: Env) extends Result
-  case class ApplyRules(rules: List[ApplyRule]) extends Result
+  private case class Done(env: Env) extends Result
+  private case class ApplyRules(rules: List[ApplyRule]) extends Result
 
   type Proofs = List[(Tag, Rule)]
 
@@ -82,23 +82,17 @@ object prolog {
           case (x, Var(y)) =>
             Some(Env(cur.toMap + (y -> x)))
           case (Fun(x, xs), Fun(y, ys)) if x == y && xs.length == ys.length =>
-            xs.zip(ys).foldRight[Option[Env]](env) { (q, w) => unify(q._1, q._2)(w)(T) }
+            xs.zip(ys).foldRight[Option[Env]](env) { (q, w) => unify(q._1, q._2)(w)(using T) }
           case _ =>
             None
         }
     }
 
   def solve(rules: List[Rule], env: Option[Env], tags: List[TaggedTerm])(implicit L: Taggable[List[Rule]], T: Subst[Term]): Result =
-    (rules, env, tags) match {
+    (rules, env, tags).runtimeChecked match {
       case (_, None, _) =>
         ApplyRules(List.empty[ApplyRule])
       case (_, Some(e), Nil) =>
         Done(e)
-      case (rs, e, (tg, t) :: ts) =>
-        ???
     }
-
 }
-
-
-

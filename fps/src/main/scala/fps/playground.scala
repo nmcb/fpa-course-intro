@@ -1,4 +1,4 @@
-package playground
+package fps
 
 val someProductionList: List[Int] = List.range(1, 1000000)
 
@@ -7,8 +7,8 @@ def odd[A](l: List[A]):  Boolean = if (l.isEmpty) false else even(l.tail)
 
 def throwStackOverflowException(): Unit = even(someProductionList)
 
-import cats.effect._
-import unsafe.implicits.global
+import cats.effect.*
+import cats.effect.unsafe.implicits.global
 
 def lazyEven[A](l: List[A]): IO[Boolean] = if (l.isEmpty) IO(true)  else IO.defer(lazyOdd(l.tail))
 def lazyOdd[A](l: List[A]):  IO[Boolean] = if (l.isEmpty) IO(false) else IO.defer(lazyEven(l.tail))

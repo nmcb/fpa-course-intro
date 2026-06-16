@@ -7,7 +7,7 @@ case class AllInOnePair[T0,T1](t0: T0, t1: T1)(implicit ordT0: Ordering[T0], ord
   def `__>`(that: AllInOnePair[T0,T1]): Boolean = {
     val ot0 = ordT0.compare(this.t0, that.t0)
     val ot1 = ordT1.compare(this.t1, that.t1)
-    (ot0, ot1) match {
+    (ot0, ot1).runtimeChecked match {
       // left-, ie. `Pair.t0` biased
       case ( 1,  _) => true
       case (-1,  _) => false
