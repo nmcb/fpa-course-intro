@@ -1,6 +1,9 @@
-//object vector extends App {
-//
-//  // inductive definitions used to treat a type-parameter `N` as a natural number
+package fpa
+package playground
+
+object Vector:
+
+// inductive definitions used to treat a type-parameter `N` as a natural number
 //  trait Z
 //  trait S[N]
 //
@@ -56,12 +59,13 @@
 //    }
 //    pre + loop(vec) + post
 //  }
-//
-//  // a couple of use-cases
-//  val ints = 1 :: 2 :: 3 :: empty
-//  val strs = map(ints)(_.toString)
-//  val sum  = foldLeft(ints)(0)(_+_)
-//  println("ints = " + ints.toString)
-//  println("strs = " + strs.toString)
-//  println("sum  = " + sum)
-//}
+
+  @main
+  /** Run a couple of use-cases */*
+  def runVector(args: String*): Unit =
+    val ints = 1 :: 2 :: 3 :: empty
+    val strs = map(ints)(_.toString)
+    val sum  = foldLeft(ints)(0)(_+_)
+    println("ints = " + ints.toString)
+    println("strs = " + strs.toString)
+    println("sum  = " + sum)
