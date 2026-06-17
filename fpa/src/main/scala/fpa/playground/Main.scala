@@ -1,6 +1,7 @@
-package fpa.playground
+package fpa
+package playground
 
-object Main extends App {
+object Main {
 
   class Printer[A](val callback: (A => Unit) => Unit) extends Thread {
 
@@ -49,6 +50,8 @@ object Main extends App {
 
   import cats.effect.unsafe.implicits.global
 
-  prog.unsafeRunSync()
-  println("prog ended!")
+  @main
+  def runPrinter(args: String*): Unit =
+    prog.unsafeRunSync()
+    println("prog ended!")
 }

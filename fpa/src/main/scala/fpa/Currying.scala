@@ -1,7 +1,6 @@
 package fpa
-package currying
 
-object Main extends App {
+object Currying:
   
   def curry[A,B,C](f: (A, B) => C): A => B => C =
     (a: A) => (b: B) => f(a,b)
@@ -24,7 +23,9 @@ object Main extends App {
   def uncurry[A,B,C](f: A => B => C): (A, B) => C =
     (a: A, b: B) => f(a)(b)
 
-  assert(
-    uncurry(curry(charAndStringToInt))('1', "23") == charAndStringToInt('1', "23")
-  )
-}
+  @main
+  def run(args: String*): Unit =
+    assert(
+      uncurry(curry(charAndStringToInt))('1', "23") == charAndStringToInt('1', "23")
+    )
+

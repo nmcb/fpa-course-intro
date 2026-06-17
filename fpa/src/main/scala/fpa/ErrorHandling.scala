@@ -4,7 +4,7 @@ import cats._
 import cats.data._
 import cats.effect._
 
-object Main:
+object ErrorHandling:
 
   /** Functional errors */
   private sealed trait Deviation
@@ -80,5 +80,5 @@ object Main:
   import cats.effect.unsafe.implicits.global
 
   @main
-  def run(args: String*): Unit =
+  def runErrorHandling(args: String*): Unit =
     prog.unsafeRunSync()

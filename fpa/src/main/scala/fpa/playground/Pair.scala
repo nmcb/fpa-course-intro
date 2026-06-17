@@ -25,22 +25,25 @@ case class AllInOnePair[T0,T1](t0: T0, t1: T1)(implicit ordT0: Ordering[T0], ord
      this.`===`(that)  && !this.`__>`(that)
 }
 
-object MainAllInOnePair extends App {
+object MainAllInOnePair:
+
   val p1 = AllInOnePair(1, "one")
   val p2 = AllInOnePair(2, "two")
   val p0 = AllInOnePair(0,  1.0 )
 
-  // println(p0 `===` p1)  // type error
-  println(p1 `===` p2)
-  println(p1 `__>` p2)
-  println(p1 `_>=` p2)
-  println(p1 `__<` p2)
-  println(p1 `_<=` p2)
-}
+  def runAllInOnePair(args: String*): Unit =
+    // println(p0 `===` p1)  // type error
+    println(p1 `===` p2)
+    println(p1 `__>` p2)
+    println(p1 `_>=` p2)
+    println(p1 `__<` p2)
+    println(p1 `_<=` p2)
+
 
 case class JustTheDataPair[T0,T1](t0: T0, t1: T1)
 
-object MainJustTheDataPair extends App {
+object MainJustTheDataPair {
+
   implicit def ordPair[T0 : Ordering,T1 : Ordering]: Ordering[JustTheDataPair[T0,T1]] =
     (p0: JustTheDataPair[T0, T1], p1: JustTheDataPair[T0, T1]) => {
       val ot0 = implicitly[Ordering[T0]].compare(p0.t0, p1.t0)
@@ -62,34 +65,36 @@ object MainJustTheDataPair extends App {
       ord.lteq(self, that)
   }
 
-  val p1 = JustTheDataPair(1, "one")
-  val p2 = JustTheDataPair(2, "two")
-  val p0 = JustTheDataPair(0,  1.0 )
+  @main
+  def runJustTheDataPair(args: String*): Unit =
+    val p1 = JustTheDataPair(1, "one")
+    val p2 = JustTheDataPair(2, "two")
+    val p0 = JustTheDataPair(0,  1.0 )
 
-  // println(p0 `===` p1)  // type error
-  println(p1 `===` p2)
-  println(p1 `__>` p2)
-  println(p1 `_>=` p2)
-  println(p1 `__<` p2)
-  println(p1 `_<=` p2)
+    // println(p0 `===` p1)  // type error
+    println(p1 `===` p2)
+    println(p1 `__>` p2)
+    println(p1 `_>=` p2)
+    println(p1 `__<` p2)
+    println(p1 `_<=` p2)
 
-  // but.. in scala the existence of an `Ordering[Pair[T0,T1]]` provides its own
-  // derived (non-symbolic) methods `equiv`, `gt`, `lt`, `gteq`, `lteq` and even
-  // `min` and `max`.  additionally `Ordering[A]` comes with its own (symbolic)
-  // `Ops`, we can therefore omit our implicit `JustTheDataPairOps` class and use
-  // these operations directly.
+    // but.. in scala the existence of an `Ordering[Pair[T0,T1]]` provides its own
+    // derived (non-symbolic) methods `equiv`, `gt`, `lt`, `gteq`, `lteq` and even
+    // `min` and `max`.  additionally `Ordering[A]` comes with its own (symbolic)
+    // `Ops`, we can therefore omit our implicit `JustTheDataPairOps` class and use
+    // these operations directly.
 
-  import scala.language.implicitConversions
+    import scala.language.implicitConversions
 
-  implicit def mkOrderingPairOps[T0,T1](lhs: JustTheDataPair[T0,T1])(implicit ord: Ordering[JustTheDataPair[T0,T1]]): ord.OrderingOps =
-    ord.mkOrderingOps(lhs)
+    implicit def mkOrderingPairOps[T0,T1](lhs: JustTheDataPair[T0,T1])(implicit ord: Ordering[JustTheDataPair[T0,T1]]): ord.OrderingOps =
+      ord.mkOrderingOps(lhs)
 
-//  println(p0 equiv p1)
-  println(p1 equiv p2)
-  println(p1 >   p2)
-  println(p1 >=  p2)
-  println(p1 <   p2)
-  println(p1 <=  p2)
-  println(p1 min p2)
-  println(p1 max p2)
+  //  println(p0 equiv p1)
+    println(p1 equiv p2)
+    println(p1 >   p2)
+    println(p1 >=  p2)
+    println(p1 <   p2)
+    println(p1 <=  p2)
+    println(p1 min p2)
+    println(p1 max p2)
 }

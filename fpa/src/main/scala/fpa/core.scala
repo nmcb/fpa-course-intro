@@ -47,6 +47,7 @@ object Tree:
     * Node(Node(Leaf(1),Node(Leaf(2),Leaf(3))),Node(Leaf(4),Leaf(5)))
     */
   def parseIntTree(s: String): Tree[Int] =
+    import parsers.*
     import P.*
 
     def leaf: P[Tree[Int]] =
