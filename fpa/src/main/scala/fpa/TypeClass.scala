@@ -23,7 +23,6 @@ object TypeClass:
 
     /** Q 4: We should have a nice syntax - implement it */
     extension [A : Mask](a: A)
-      @tailrec
       def disclose: String =
         summon[Mask[A]].disclose(a)
 
