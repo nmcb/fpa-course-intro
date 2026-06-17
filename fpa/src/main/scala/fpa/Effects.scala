@@ -19,11 +19,10 @@ object Effects:
   val pureProg1: Int = twice(x, x)
   val pureProg2: Int = twice(1 + 2, 1 + 2)
 
-  /** But in the face of side-effects we loose our ability to reason about programs : */
-  lazy val y: Int = {
+  /** But in the face of side effects we lose our ability to reason about programs : */
+  lazy val y: Int =
     println("evaluating y = 1 + 2")
     1 + 2
-  }
 
   /** As equational reasoning becomes dependent on the order and memoization strategy of expression evaluation : */
   val impureProg1: Int = twice(y, y)
@@ -39,10 +38,12 @@ object Effects:
   }
 
   /** Unfortunately, this requires a new program structure ... as we now enforce pure expression passing */
-  def twice[A : Semigroup](a1: IO[A], a2: IO[A]): IO[A] = for {
-    x <- a1
-    y <- a2
-  } yield Semigroup[A].combine(x, y)
+  def twice[A : Semigroup](a1: IO[A], a2: IO[A]): IO[A] =
+    for
+      x <- a1
+      y <- a2
+    yield
+      Semigroup[A].combine(x, y)
 
   val pureSideEffectingProg1: IO[Int] = twice(z, z)
   val pureSideEffectingProg2: IO[Int] = twice(
@@ -76,11 +77,10 @@ object Effects:
       /** Q1 : Refactor the imperative application below into an `IO` for comprehension. */
       def f2c(f: Double): Double = (f - 32) * 5.0 / 9.0
     
-      val main: Unit = {
+      val main: Unit =
         print(s"=>> Enter a temperature in degrees °F : ")
         val fahrenheit = StdIn.readDouble()
         println(s"=>> $fahrenheit °F === ${f2c(fahrenheit)} °C")
-      }
     
       /** Q2 : Factor the sub expressions out in separate `IO` expressions */
       // def writeUsage
@@ -97,15 +97,19 @@ object Effects:
         **/
     
       /** Q3: Handle the div by zero case by returning `Double.NaN`. */
-      def inverse1(d: Double): IO[Double] = for {
-        inverse <- IO (1 / d)
-      } yield inverse
+      def inverse1(d: Double): IO[Double] =
+        for
+          inverse <- IO (1 / d)
+        yield
+          inverse
     
       /** Q4: Handle the div by zero case by transforming into a user specific exception. */
       case class NoInverse(msg: String = "value has no inverse") extends RuntimeException(msg)
-      def inverse2(d: Double): IO[Double] = for {
-        inverse <- IO (1 / d)
-      } yield inverse
+      def inverse2(d: Double): IO[Double] =
+        for
+          inverse <- IO (1 / d)
+        yield
+          inverse
     
       /** Sometimes we need the pure, referentially transparent IO expressions of our core code-
         * base, to interact with legacy frameworks, probably requiring the evaluation of those
@@ -113,14 +117,14 @@ object Effects:
         **/
     
       /** Q5: Read the Cats IO docs (https://tinyurl.com/y7lznf6h) and implement `client.name()` */
-      object core {
-        def promptName: IO[String] = for {
-          _    <- IO(println("What's your name?"))
-          name <- IO(StdIn.readLine().trim)
-        } yield name
-      }
-      object client {
+      object core:
+        def promptName: IO[String] =
+          for
+            _    <- IO(println("What's your name?"))
+            name <- IO(StdIn.readLine().trim)
+          yield
+            name
+      
+      object client:
         def name(): Future[String] =
-          ???
-      }
-    
+          sys.error("unimplemented")

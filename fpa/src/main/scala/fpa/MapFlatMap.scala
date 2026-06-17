@@ -27,7 +27,7 @@ package fpa
   */
 object MapFlatMap:
   
-  object library {
+  object library:
   
     // Implementation Notes:
     // - Map is categorically defined as     :: (a -> b) -> m a -> m b
@@ -35,24 +35,24 @@ object MapFlatMap:
   
     /** Q1: Implement a naive map on options with a pattern match on `oa`. */
     def fmapOption[A, B](f: A => B)(oa: Option[A]): Option[B] =
-      ???
+      sys.error("unimplemented")
   
     /** Q2: Implement a naive map on lists with a pattern match on `la`. */
     def fmapList[A, B](f: A => B)(la: List[A]): List[B] =
-      ???
-  
-    trait Map[M[_]] {
+      sys.error("unimplemented")
+
+    trait Map[M[_]]:
       def fmap[A, B](f: A => B)(ma: M[A]): M[B]
-    }
   
     /** Q3: Implement an option and list instance for the `Map` type class. */
-    object Map {
+    object Map:
       implicit val listMap: Map[List] =
-        ???
-  
+        sys.error("unimplemented")
+
+
       implicit val optionMap: Map[Option] =
-        ???
-    }
+        sys.error("unimplemented")
+        
   
     /** Q4: Create a syntax for the `Map` type class. */
     // Hint: you want an implicit class that wraps a generic `M[A]` type class
@@ -65,26 +65,23 @@ object MapFlatMap:
   
     /** Q5: Implement a `Map` instance for your own data type */
     case class Pair[A](a1: A, a2: A)
-    object Pair {
+    object Pair:
       implicit val pairMap: Map[Pair] =
-        ???
-    }
+        sys.error("unimplemented")
   
     /** Q6 - Q8: Implement the same functionality for type class `FlatMap`. */
-    trait FlatMap[M[_]] {
+    trait FlatMap[M[_]]:
       def bind[A, B](ma: M[A])(f: A => M[B]): M[B]
-    }
   
-    object FlatMap {
+    object FlatMap:
       implicit val listFlatMap: FlatMap[List] =
-        ???
-  
+        sys.error("unimplemented")
+
       implicit val optionFlatMap: FlatMap[Option] =
-        ???
-  
+        sys.error("unimplemented")
+      
       implicit val pairFlatMap: FlatMap[Pair] =
-        ???
-    }
+        sys.error("unimplemented")
   
     // `implicit class FlatMapOps[M[_], A]` ...
   
@@ -95,4 +92,3 @@ object MapFlatMap:
       * the code strings in tests Q4 and Q8.  After that enable Q9 and make it
       * compile.
       */
-  }
