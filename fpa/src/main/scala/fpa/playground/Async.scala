@@ -33,20 +33,25 @@ object Async:
   import duration._
 
   private val program = IO.async[Int]: (callback: Either[Throwable, Int] => Unit) =>
-    IO {
-      import scala.concurrent.ExecutionContext.Implicits.global
+    IO.apply:
+
+      import ExecutionContext.Implicits.global
+
       println("started!")
+
       val future = scala.concurrent.Future:
         Thread.sleep(5000)
         println("finished!")
+
       Await.result(future, Duration.Inf)
+
       callback(Right(1))
       Some(IO.unit)
-    }
-
-  import cats.effect.unsafe.implicits.global
 
   @main
   def runPrinter(args: String*): Unit =
+    
+    import unsafe.implicits.global
+    
     program.unsafeRunSync()
     println("prog ended!")
