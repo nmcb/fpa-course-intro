@@ -1,7 +1,7 @@
 package fpa
 package playground
 
-object Contra:
+object Optional:
 
   sealed trait Opt[+A]:
 

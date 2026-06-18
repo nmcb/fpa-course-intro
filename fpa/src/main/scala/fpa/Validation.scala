@@ -45,15 +45,17 @@ object Validation:
       def decode(str: String): ValidatedNel[Error, A]
   
     /** And add a nice syntax to decode `String`s */
-    implicit class DecoderOps(val str: String):
+    extension (str: String)
       def as[A : Decoder]: ValidatedNel[Error, A] =
-        implicitly[Decoder[A]].decode(str)
+        summon[Decoder[A]].decode(str)
   
     /** Inbound data (see `test/resources/data.csv`) needs to adhere to a couple of patterns */
     val RecordPattern: Regex =
       """"(.*)",(.*),(.*),(.*),(.*),(.*)""".r
+
     val PhonePattern: Regex  =
       """(\\+[0-9][0-9])?([0-9]+)""".r
+
     val BirthDayPattern: DateTimeFormatter =
       DateTimeFormatter.ofPattern("dd/MM/yyyy")
   
@@ -62,31 +64,31 @@ object Validation:
     import domain._
   
     /** Q1: Decode address as a trimmed (non-empty) string value. Hint, see `Validated.toValidatedNel` */
-    implicit val addressDecoder: Decoder[Address] = (str: String) =>
-      sys.error("unimplemented")
+    given Decoder[Address] =
+      (str: String) => sys.error("unimplemented")
   
     /** Q2: Decode postal code as a trimmed upper-cased (non-empty) value. */
-    implicit val postalCodeDecoder: Decoder[PostalCode] = (str: String) =>
-      sys.error("unimplemented")
+    given Decoder[PostalCode] =
+      (str: String) => sys.error("unimplemented")
 
     /** Q3: Decode name as comma separated first- and last-name string values, both mandatory and trimmed */
-    implicit val nameDecoder: Decoder[Name] = (str: String) =>
-      sys.error("unimplemented")
+    given Decoder[Name] =
+      (str: String) => sys.error("unimplemented")
 
     /** Q4: Decode phone numbers as trimmed sequences of numbers, `-` and ` ` characters removed,
       * numbers starting with a `+` and the following two digits should be decoded as country.
       * E.g. 0612345 -> Phone(None, "0612345") and +31612345 -> Phone(Some("+31"), "612345")
       */
-    implicit val phoneDecoder: Decoder[Phone] = (str: String) =>
-      sys.error("unimplemented")
+    given Decoder[Phone] =
+      (str: String) => sys.error("unimplemented")
 
     /** Q5: Decode debit value currencies as Scala doubles, i.e. `String.toDouble` */
-    implicit val debitDecoder: Decoder[Debit] = (str: String) =>
-      sys.error("unimplemented")
+    given Decoder[Debit] =
+      (str: String) => sys.error("unimplemented")
 
     /** Q6: Decode birthday values according to format `dd/MM/yyyy` */
-    implicit val birthDayDecoder: Decoder[BirthDay] = (str: String) =>
-      sys.error("unimplemented")
+    given Decoder[BirthDay] =
+      (str: String) => sys.error("unimplemented")
 
     /** You will have noted that although each decoder above may return only one
       * error at a time, we still allowed the result of a decoder to hold multiple
@@ -101,7 +103,7 @@ object Validation:
       * error messages on the left side of the `ValidatedNel` if one or more of the decoding
       * applications fails.
       */
-    implicit val debitRecordDecoder: Decoder[DebitRecord] = {
-        case RecordPattern(c1, c2, c3, c4, c5, c6) => sys.error("unimplemented")
-        case str                                   => invalidNel(s"Invalid line pattern `${RecordPattern.regex}`: '$str'")
-      }
+    given Decoder[DebitRecord] = {
+      case RecordPattern(c1, c2, c3, c4, c5, c6) => sys.error("unimplemented")
+      case str                                   => invalidNel(s"Invalid line pattern `${RecordPattern.regex}`: '$str'")
+    }
