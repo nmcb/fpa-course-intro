@@ -1,7 +1,5 @@
 package fpa
 
-import scala.annotation.tailrec
-
 object TypeClass:
 
   object library:
@@ -31,11 +29,11 @@ object TypeClass:
 
     import library.*
 
-    /** Q 1: implement a client side explicit implicit parameter syntax */
+    /** Q 1: implement a client side explicit using parameter syntax */
     def loggingMethodUsingMaskExplicitly[A](a: A)(using mask: Mask[A]): String =
       mask.disclose(a)
 
-    /** Q 2: Implement a client side implicit implicit parameter syntax */
+    /** Q 2: Implement a client side implicit using parameter syntax */
     def loggingMethodUsingMaskImplicitly[A : Mask](a: A): String =
       summon[Mask[A]].disclose(a)
 
