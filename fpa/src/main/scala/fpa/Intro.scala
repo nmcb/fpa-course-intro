@@ -6,9 +6,9 @@ object Intro:
 
   object Main extends Greeting:
 
+    @main
     def runIntro(args: String*): Unit =
       println(greeting)
-
-
+  
   trait Greeting:
     lazy val greeting: String = "Hello Anonymous Functional Programmer !!!"

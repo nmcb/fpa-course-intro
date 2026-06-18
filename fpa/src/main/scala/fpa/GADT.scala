@@ -2,8 +2,8 @@ package fpa
 
 object GADT:
 
-  enum Expr[A]:
-    case Var[A](a: A)                               extends Expr[A]
+  enum Expr[E]:
+    case Var(e: E)                                  extends Expr[E]
     case Lit(n: Int)                                extends Expr[Int]
     case Plus(lhs: Expr[Int], rhs: Expr[Int])       extends Expr[Int]
     case Fun[A, B](fun: Expr[A] => Expr[B])         extends Expr[A => B]

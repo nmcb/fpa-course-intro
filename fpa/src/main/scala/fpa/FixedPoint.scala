@@ -1,6 +1,6 @@
 package fpa
 
-object FixedPoint {
+object FixedPoint:
 
   /*** We're going to implement a HList using fixed-points at type level ***/
 
@@ -16,7 +16,7 @@ object FixedPoint {
   /**
     *  Replace the recursive call with a higher order function parameter.
     */
-  val facLike: (Int => Int) => (Int => Int) =
+  val facLike: (Int => Int) => Int => Int =
     (f: Int => Int) =>
       (n: Int) =>
         if (n == 0) 1 else n * f(n - 1)
@@ -25,7 +25,7 @@ object FixedPoint {
     *  For the moment, assume a library factorial function exists.
     */
   lazy val facLib: Int => Int =
-    ???
+    sys.error("unimplemented")
 
   /**
     *  Then it's easy to see that passing facLib as f is also factorial.
@@ -108,8 +108,8 @@ object FixedPoint {
     *
     *  Note that the input's function type is, itself, formed as the return type.
     */
-  def fix[A]: ((A => A) => (A => A)) => (A => A) =
-    (f: (A => A) => (A => A)) =>
+  def fix[A]: ((A => A) => A => A) => A => A =
+    (f: (A => A) => A => A) =>
       (a: A) =>
         f(fix(f))(a)
 
@@ -251,4 +251,3 @@ object FixedPoint {
     */
   val hellYeah: Seq[Int :: String :: HNil] =
     Seq(hs)
-}

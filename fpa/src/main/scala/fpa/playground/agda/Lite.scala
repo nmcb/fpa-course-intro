@@ -1,7 +1,8 @@
 package fpa
-package fpa.playground.agda
+package playground
+package agda
 
-object lite {
+object Lite:
 
   sealed trait Expr
   sealed trait Term extends Expr
@@ -14,5 +15,3 @@ object lite {
   case class Dtp(symbol: Symbol)           extends Type  // Datatype
   case class Dat(symbol: Symbol, t: Type)  extends Type  // Data constructor
   case class Fun(symbol: Symbol)           extends Term  // Defined function
-
-}

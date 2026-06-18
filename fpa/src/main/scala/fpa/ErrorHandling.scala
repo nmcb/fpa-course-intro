@@ -31,15 +31,14 @@ object ErrorHandling:
     MonadError[ResultT, Throwable].raiseError(new RuntimeException("Boom!"))
 
 
-  private object http {
+  private object http:
 
     /** Pretend a response is a http code and a body */
     private type Response = String
 
     /** Interface to "compute" a response string from a result and code */
-    trait Http[A] {
+    trait Http[A]:
       def asResponse(result: A): Int => IO[Response]
-    }
 
     implicit def httpRoom: Http[Room] =
       (room: Room) => (code: Int) => IO(s"$code : $room")
@@ -48,34 +47,32 @@ object ErrorHandling:
       (error: E) => (code: Int) => IO(s"$code : ${error.toString}")
 
     implicit def httpResult[A : Http]: Http[Result[A]] =
-      (result: Result[A]) => (code: Int) => result match {
+      (result: Result[A]) => (code: Int) => result match
       case Left(deviation) => deviation.toResponse(code)
       case Right(value)    => value.toResponse(code)
-    }
 
     private case class ServerError(msg: String) extends Deviation
 
     implicit def httpResultT[A : Http]: Http[ResultT[A]] =
       (result: ResultT[A]) => (code: Int) => {
-        val recovered = MonadError[ResultT, Throwable].recoverWith(result) {
+        val recovered = MonadError[ResultT, Throwable].recoverWith(result):
           case t: Throwable => ResultT.leftT[IO, A](ServerError(t.getMessage))
-        }
         recovered.value.flatMap(_.toResponse(code))
       }
 
-    implicit class HttpOps[A : Http](underlying: A) {
+    implicit class HttpOps[A : Http](underlying: A):
       def toResponse(code: Int): IO[Response] =
         implicitly[Http[A]].asResponse(underlying)(code)
-    }
-  }
 
-  import http._
+  import http.*
 
-  val prog: IO[Unit] = for {
-    _ <- callWhichSucceeds.toResponse(201).map(println)
-    _ <- callWhichDeviates.toResponse(200).map(println)
-    _ <- callWhichThrows.toResponse(500).map(println)
-  } yield ()
+  val prog: IO[Unit] =
+    for
+      _ <- callWhichSucceeds.toResponse(201).map(println)
+      _ <- callWhichDeviates.toResponse(200).map(println)
+      _ <- callWhichThrows.toResponse(500).map(println)
+    yield
+      ()
 
   import cats.effect.unsafe.implicits.global
 
