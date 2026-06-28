@@ -24,4 +24,4 @@ jobs:
     - uses: sbt/setup-sbt@v1
     - name: sbt-test
       shell: bash
-      run: sbt -v +test osvScan single-report
+      run: sbt -v +test osvScan all-projects single-report
