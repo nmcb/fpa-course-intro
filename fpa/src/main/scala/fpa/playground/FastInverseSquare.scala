@@ -5,15 +5,19 @@ import scala.util.Random
 
 object FastInverseSquare:
 
-  // fast inverse sqrt implementation - https://youtu.be/p8u_k2LIZyo
+  /**
+   * Fast inverse sqrt implementation.
+   *
+   * @see [quake-iii](https://youtu.be/p8u_k2LIZyo)
+   */
 
   import _root_.java.lang.Float.floatToIntBits
   import _root_.java.lang.Float.intBitsToFloat
 
-  val threehalfs: Float = 1.5f
-  val half: Float       = 0.5f
+  private val threehalfs: Float = 1.5f
+  private val half: Float       = 0.5f
 
-  def fastInverseSquare(n: Float): Float =
+  private def fastInverseSquare(n: Float): Float =
     val x: Float = n * half
     var y: Float = n
     var i: Int   = floatToIntBits(y)
@@ -24,13 +28,13 @@ object FastInverseSquare:
 
     y
 
-  def mathInverseSquare(n: Float): Float =
+  private def mathInverseSquare(n: Float): Float =
     1.0f / scala.math.sqrt(n.toDouble).toFloat
 
-  val size   = 1000000
-  val rounds = 200
-  val ns     = for _ <- 1 to size   yield Random.nextFloat()
-  val test   = for t <- 1 to rounds yield
+  private val size   = 1000000
+  private val rounds = 200
+  private val ns     = for _ <- 1 to size   yield Random.nextFloat()
+  private val test   = for t <- 1 to rounds yield
     
     val start1 = System.currentTimeMillis
     for n <- ns yield mathInverseSquare(n)    
@@ -40,7 +44,7 @@ object FastInverseSquare:
 
     (start2 - start1, stop - start2)
 
-  def avg(xs: IndexedSeq[Long]): Double =
+  private def avg(xs: IndexedSeq[Long]): Double =
     xs.foldLeft(0L)(_ + _).toDouble / xs.length.toDouble
 
   @main
