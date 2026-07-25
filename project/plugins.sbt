@@ -1,1 +1,1 @@
-addSbtPlugin("net.nmoncho" % "sbt-osv" % "0.2.0")
+addSbtPlugin("net.nmoncho" % "sbt-osv" % "0.3.0")
